@@ -19,10 +19,19 @@ console.log (store.getState());
 const unsubscribe = store.subscribe( () => console.log(store.getState()) );
 
 console.log ('# Login...');
-store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456')).catch(err => console.log (err));
+store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
+  .then( () => {
+    console.log (' User is logged and data is loaded');
+    console.log(store.getState());
+  })
+  .catch(err => console.log (err));
 
 console.log ('# Fetching...');
-store.dispatch(action.todos.fetch()).then( () => console.log(store.getState()));
+store.dispatch(action.todos.fetch())
+  .then( () => {
+    console.log (' Todos are loaded');
+    console.log(store.getState())
+  });
 
 /*
 

@@ -1,25 +1,27 @@
 "use strict"
 
-import auth from '../auth-services.js';
+import auth from '../auth-services';
+import db from '../data-services';
 import { data } from './data';
 import { NODE_USER } from '../constants'; 
 
 /* action types */
 export const USER = {
   /* synchronous actions */
-  LOAD          : 'user.load',
+  UPDATE        : 'user.update',
   /* asynchronous actions */
-  SIGNIN        : 'auth.signin',
-  SIGNOUT       : 'auth.signout'
+  SIGNIN        : 'user.signin',
+  SIGNOUT       : 'user.signout',
+  LOAD          : 'user.load',
 }
 
 /* action creators */
 export const user = {
 
   /* synchronous actions */
-  load(user) {
+  update(user) {
     return {
-      type    : USER.LOAD,
+      type    : USER.UPDATE,
       payload : {
         user: user
       }
@@ -30,11 +32,9 @@ export const user = {
 
   signIn(email, password) {
 
-    return (dispatch) => {
-      dispatch(data.request(NODE_USER));
+    return (dispatch) => {      
       return auth.signInWithEmailAndPassword(email, password).then( user => {
-        dispatch(this.load(user));
-        dispatch(data.received(NODE_USER));
+        return dispatch(this.load(user));        
       });
     } 
 
@@ -42,6 +42,22 @@ export const user = {
 
   signOut() {
 
+  },
+
+  load(user) {
+    return (dispatch) => {
+      dispatch(data.request(NODE_USER));
+      return new Promise((resolve, reject) => {
+         db.users.child(user.uid).on('value', snapshot => {
+          const UserPrivateData = snapshot.val();
+          user.msg    = UserPrivateData.msg;
+          user.todos  = UserPrivateData.tasks;
+          dispatch(this.update(user));
+          dispatch(data.received(NODE_USER));
+          resolve(user);
+        });
+      });       
+    };
   }
 
 }

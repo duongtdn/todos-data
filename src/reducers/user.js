@@ -8,7 +8,7 @@ export function user (state = {}, action) {
 
   switch (action.type) {
 
-    case USER.LOAD : 
+    case USER.UPDATE : 
       return action.payload.user;
 
     default :

@@ -40,7 +40,7 @@ export function todos (state = {}, action) {
       });
       return newState;
     
-    case TODOS.LOAD :
+    case TODOS.UPDATE :
       return action.payload.data;
 
     default :
