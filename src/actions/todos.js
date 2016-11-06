@@ -11,7 +11,7 @@ export const TODOS = {
   ADD       : 'todos.add',
   COMPLETE  : 'todos.complete',
   CANCEL    : 'todos.cancel',
-  UPDATE    : 'todos.update',
+  LOAD      : 'todos.load',
   /* asynchronous actions */
   FETCH     : 'todos.fetch'
 }
@@ -55,9 +55,9 @@ export const todos = {
     }
   },
 
-  update(data) {
+  load(data) {
     return {
-      type    : TODOS.UPDATE,
+      type    : TODOS.LOAD,
       payload : {
         data
       }
@@ -80,7 +80,7 @@ export const todos = {
           db.tasks.on('value', snapshot => {
             console.log (`# --- Received data`);
             const todoList = snapshot.val();
-            dispatch(todos.update(todoList));
+            dispatch(todos.load(todoList));
             dispatch(data.received(NODE_TODOS));
             resolve(todoList);
           });
