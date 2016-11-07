@@ -77,12 +77,11 @@ export const todos = {
         // The function called by the thunk middleware can return a value,
         // that is passed on as the return value of the dispatch method.
         return new Promise((resolve, reject) => {
-          db.tasks.on('value', snapshot => {
-            const todoList = snapshot.val();
+          db.get.todos( todoList => {
             dispatch(todos.update(todoList));
             dispatch(data.received(NODE_TODOS));
             resolve(todoList);
-          });
+          })
         });
         // catch error
 

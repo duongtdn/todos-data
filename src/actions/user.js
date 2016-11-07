@@ -48,10 +48,9 @@ export const user = {
     return (dispatch) => {
       dispatch(data.request(NODE_USER));
       return new Promise((resolve, reject) => {
-         db.users.child(user.uid).on('value', snapshot => {
-          const UserPrivateData = snapshot.val();
-          user.msg    = UserPrivateData.msg;
-          user.todos  = UserPrivateData.tasks;
+        db.get.userPrivateData(userPrivateData => {
+          user.msg    = userPrivateData.msg;
+          user.todos  = userPrivateData.tasks;
           dispatch(this.update(user));
           dispatch(data.received(NODE_USER));
           resolve(user);

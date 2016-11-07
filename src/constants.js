@@ -19,4 +19,4 @@ export const FETCH = {
 }
 
 export const NODE_TODOS = 'listTodos';
-export const NODE_USER  = 'user';
+export const NODE_USER  = 'userDATA';
