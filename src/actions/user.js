@@ -3,7 +3,8 @@
 import auth from '../auth-services';
 import db from '../data-services';
 import { data } from './data';
-import { NODE_USER } from '../constants'; 
+import { error } from './error';
+import { ERROR, NODE_USER } from '../constants'; 
 
 /* action types */
 export const USER = {
@@ -22,9 +23,7 @@ export const user = {
   update(user) {
     return {
       type    : USER.UPDATE,
-      payload : {
-        user: user
-      }
+      payload : { user }
     }
   },
 
@@ -33,9 +32,17 @@ export const user = {
   signIn(email, password) {
 
     return (dispatch) => {      
-      return auth.signInWithEmailAndPassword(email, password).then( user => {
-        return dispatch(this.load(user));        
-      });
+      return auth.signInWithEmailAndPassword(email, password)
+        .then( user => {
+          // successful signed in, clear error flag if any 
+          dispatch(error.clear(ERROR.SIGNIN));
+          // then, load user private data
+          return dispatch(this.load(user));        
+        })
+        .catch( err => {
+          // sign in error
+          return dispatch(error.update(ERROR.SIGNIN, err));
+        });
     } 
 
   },

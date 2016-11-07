@@ -19,11 +19,20 @@ console.log (store.getState());
 const unsubscribe = store.subscribe( () => console.log(store.getState()) );
 
 console.log ('# Login...');
-store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
-  .then( () => {
-    console.log (' User is logged and data is loaded');
+// attem to login with wrong pass
+store.dispatch(action.user.signIn('mainth@stormgle.com','0123456'))
+  .then( (dat) => {
+    console.log (' Logged Failed');
     console.log(store.getState());
-  })
+    console.log ('# Re-Login...');
+    // re-login with right pass
+    store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
+      .then( (dat) => {
+        console.log (' User is logged and data is loaded');
+        console.log(store.getState());
+      })
+      .catch(err => console.log (err));
+  })  
   .catch(err => console.log (err));
 
 console.log ('# Fetching...');

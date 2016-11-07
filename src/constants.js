@@ -6,6 +6,10 @@ export const STATUS = {
   CANCELLED : 'cancelled'
 }
 
+export const ERROR = {
+  SIGNIN    : 'error.signIn'
+}
+
 export const SHOW = {
   ALL       : 'all',
   ACTIVE    : 'active',
