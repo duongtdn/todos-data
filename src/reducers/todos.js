@@ -14,12 +14,6 @@ export function todos (state = {}, action) {
   const newState = {...state};
 
   switch (action.type) {
-    
-    case TODOS.ADD :
-      // todo: change to asyn add to firebase
-      const akey =  `todo-00${autokey()}`;
-      newState[akey] = action.payload
-      return newState;
 
     case TODOS.COMPLETE :
       Object.keys(newState).forEach(id => {

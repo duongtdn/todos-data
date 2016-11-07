@@ -36,8 +36,9 @@ export const user = {
         .then( user => {
           // successful signed in, clear error flag if any 
           dispatch(error.clear(ERROR.SIGNIN));
+          dispatch(error.clear(ERROR.NOT_AUTHEN));
           // then, load user private data
-          return dispatch(this.load(user));        
+          return dispatch(this.load());        
         })
         .catch( err => {
           // sign in error
@@ -62,11 +63,12 @@ export const user = {
     }
   },
 
-  load(user) {
+  load() {
     return dispatch => {
       dispatch(data.request(NODE_USER));
       return new Promise((resolve, reject) => {
-        db.get.userPrivateData(userPrivateData => {
+        db.users.getData(userPrivateData => {
+          const user = auth.currentUser;
           user.msg    = userPrivateData.msg;
           user.todos  = userPrivateData.tasks;
           dispatch(this.update(user));
