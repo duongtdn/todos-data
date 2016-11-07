@@ -7,7 +7,8 @@ export const STATUS = {
 }
 
 export const ERROR = {
-  SIGNIN    : 'error.signIn'
+  SIGNIN    : 'error.signIn',
+  SIGNOUT   : 'error.signOut',
 }
 
 export const SHOW = {

@@ -30,6 +30,10 @@ store.dispatch(action.user.signIn('mainth@stormgle.com','0123456'))
       .then( (dat) => {
         console.log (' User is logged and data is loaded');
         console.log(store.getState());
+        store.dispatch(action.user.signOut()).then( () => {
+          console.log (' User signed out');
+          console.log(store.getState());
+        });
       })
       .catch(err => console.log (err));
   })  

@@ -31,7 +31,7 @@ export const user = {
 
   signIn(email, password) {
 
-    return (dispatch) => {      
+    return dispatch => {      
       return auth.signInWithEmailAndPassword(email, password)
         .then( user => {
           // successful signed in, clear error flag if any 
@@ -48,11 +48,22 @@ export const user = {
   },
 
   signOut() {
-
+    return dispatch => {
+      return auth.signOut()
+        .then( () => {
+          // successful signed out, clear error flag if any 
+          dispatch(error.clear(ERROR.SIGNOUT));
+          return dispatch(this.update(null));
+        })
+        .catch( err => {
+          // sign out error
+          return dispatch(error.update(ERROR.SIGNOUT, err));
+        })
+    }
   },
 
   load(user) {
-    return (dispatch) => {
+    return dispatch => {
       dispatch(data.request(NODE_USER));
       return new Promise((resolve, reject) => {
         db.get.userPrivateData(userPrivateData => {
