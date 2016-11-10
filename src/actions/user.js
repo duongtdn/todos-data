@@ -36,13 +36,11 @@ export const user = {
         .then( user => {
           // successful signed in, clear error flag if any 
           dispatch(error.clear(ERROR.SIGNIN));
-          dispatch(error.clear(ERROR.NOT_AUTHEN));
-          // then, load user private data
-          return dispatch(this.load());        
+          dispatch(error.clear(ERROR.NOT_AUTHEN));  
         })
         .catch( err => {
           // sign in error
-          return dispatch(error.update(ERROR.SIGNIN, err));
+          dispatch(error.update(ERROR.SIGNIN, err));
         });
     } 
 
@@ -54,11 +52,10 @@ export const user = {
         .then( () => {
           // successful signed out, clear error flag if any 
           dispatch(error.clear(ERROR.SIGNOUT));
-          return dispatch(this.update(null));
         })
         .catch( err => {
           // sign out error
-          return dispatch(error.update(ERROR.SIGNOUT, err));
+          dispatch(error.update(ERROR.SIGNOUT, err));
         })
     }
   },
@@ -70,7 +67,7 @@ export const user = {
         db.users.getData(userPrivateData => {
           const user = auth.currentUser;
           user.msg    = userPrivateData.msg;
-          user.todos  = userPrivateData.tasks;
+          user.todos  = userPrivateData.todos;
           dispatch(this.update(user));
           dispatch(data.received(NODE_USER));
           resolve(user);

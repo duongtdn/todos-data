@@ -16,6 +16,7 @@ export const TODOS = {
   /* asynchronous actions */
   FETCH     : 'todos.fetch',
   ADD       : 'todos.add',
+  remove    : 'todos.remove'
 }
 
 /* action creators */
@@ -23,18 +24,6 @@ export const TODOS = {
 export const todos = {
 
   /* synchronous actions */
-
-  // add(text, collaborators) {
-  //   return {
-  //     type    : TODOS.ADD,
-  //     payload : {
-  //       text          : text,
-  //       collaborators : [...collaborators],
-  //       createdAt     : new Date(),
-  //       status        : STATUS.ACTIVE
-  //     }
-  //   }
-  // },
 
   complete(id, uid) {
     return {
@@ -78,14 +67,16 @@ export const todos = {
         
         // The function called by the thunk middleware can return a value,
         // that is passed on as the return value of the dispatch method.
-        return new Promise((resolve, reject) => {
-          db.todos.get( todoList => {
-            dispatch(todos.update(todoList));
-            dispatch(data.received(NODE_TODOS));
-            resolve(todoList);
+        return new Promise ((resolve, reject) => {
+          db.users.getTodosList( list => {
+            db.todos.get(list, todosList => {
+              dispatch(todos.update(todosList));
+              dispatch(data.received(NODE_TODOS));
+              resolve(todosList);
+            });
           });
         });
-        // catch error
+        
 
       };
   },
@@ -97,20 +88,33 @@ export const todos = {
         /* add todo to todos db */
         if (!users) { users = {}; }
         users[auth.currentUser.uid] = OWNER;
+        const timestamp = new Date().getTime();
         const todoRef = db.todos.add({
           text       : text,
           users      : users,
-          createdAt  : new Date(),
+          createdAt  : timestamp,
           status     : STATUS.ACTIVE
         });  
         /* update todo id in user data */
         db.users.addTodo(todoRef.key, {status : STATUS.ACTIVE, role : OWNER});
+        return todoRef.key;
       } else {
         dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        return null;
       }
       
     }
 
+  },
+
+  remove(id) {
+    return dispatch => {
+      if (auth.currentUser) {
+        /* to be implemented after message system work */
+      } else {
+        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+      }
+    }
   }
 
 }

@@ -3,6 +3,8 @@
 import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
+import auth from './auth-services';
+
 import rootReducer from './reducers';
 import * as action from './actions';
 
@@ -18,10 +20,35 @@ const store = createStore(
   )
 );
 
+auth.onAuthStateChanged( user => {
+  if (user) {
+    console.log ('\n# User is logged ----------------------------------------');
+    store.dispatch(action.user.load()).then( user => {
+      console.log ('\n# Fetching... ---------------------------------------');
+      store.dispatch(action.todos.fetch()).then(todosList => {
+        console.log ('\n# Fetched Todos List ------------------------------');
+        console.log (todosList);
+        store.dispatch(action.todos.add('Learn firebase plus redux'));
+      });
+    });
+  } else {
+    console.log ('\n# User is not logged ------------------------------------');
+    store.dispatch(action.user.update(null)); 
+  }    
+});
+
 console.log ('\n# Initial State ---------------------------------------------');
 console.log (store.getState());
 
-const unsubscribe = store.subscribe( () => console.log(store.getState()) );
+
+// const unsubscribe = store.subscribe( () => {
+//   console.log('todos');
+//   console.log(store.getState().todos)
+//   if (store.getState().user && store.getState().user.todos) {
+//     console.log('user todos');
+//     console.log(store.getState().user.todos);
+//   } 
+// });
 
 console.log ('\n# Login... --------------------------------------------------');
 // attem to login with wrong pass
@@ -31,60 +58,8 @@ store.dispatch(action.user.signIn('mainth@stormgle.com','0123456'))
     // console.log(store.getState());
     console.log ('\n# Re-Login... -------------------------------------------');
     // re-login with right pass
-    store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
-      .then( (dat) => {
-        console.log ('\n# User is logged ------------------------------------');
-        // console.log(store.getState());
-
-        console.log ('\n# Fetching... ---------------------------------------');
-        store.dispatch(action.todos.fetch())
-          .then( () => {
-            console.log ('\n# Todos are loaded ------------------------------');
-            console.log(store.getState());
-
-            console.log ('\n# Add new todo ----------------------------------');
-            store.dispatch(action.todos.add('Learn about redux action'));
-
-            store.dispatch(action.user.signOut()).then( () => {
-              console.log ('\n# User signed out -----------------------------');
-              console.log(store.getState());
-              
-              console.log ('\n# Add new todo --------------------------------');
-              store.dispatch(action.todos.add('This todo should failed to save'));
-              console.log(store.getState());
-            });
-
-          });
-
-        
-      })
-      .catch(err => console.log (err));
-  })  
-  .catch(err => console.log (err));
-
-
-
-/*
-console.log ('# Fetching...');
-store.dispatch(action.todos.fetch())
-  .then( () => {
-    console.log (' Todos are loaded');
-    console.log(store.getState())
-  });
-
-
-// Dispatch some action
-console.log ('# Add new todo');
-store.dispatch(action.todos.add('Learn about redux action', ['duong']));
-store.dispatch(action.todos.add('Learn about redux reducer', ['duong']));
-
-console.log ('# Complete a todo');
-store.dispatch(action.todos.complete('todo-002', 'duong'));
-
-console.log ('# Cancel a todo');
-store.dispatch(action.todos.cancel('todo-001', 'duong'));
-
-*/
+    store.dispatch(action.user.signIn('mainth@stormgle.com','123456')).catch(err => console.log (err));
+  }).catch(err => console.log (err));
 
 // Stop listening to state updates
-unsubscribe();
+// unsubscribe();
