@@ -8,7 +8,7 @@ function auth (state = {}, action) {
 
   switch (action.type) {
 
-    case USER.UPDATE.AUTH :
+    case USER.AUTH.UPDATE :
       return action.payload.user;
     
     default :
@@ -21,7 +21,7 @@ function messages (state = {}, action) {
 
   switch (action.type) {
 
-    case USER.UPDATE.MESSAGE :
+    case USER.MESSAGES.UPDATE :
       return action.payload.messages;
 
     default :
@@ -34,7 +34,7 @@ function todos (state = {}, action) {
 
   switch (action.type) {
 
-    case USER.UPDATE.TODOS :
+    case USER.TODOS.UPDATE :
       return action.payload.todos;
 
     default :

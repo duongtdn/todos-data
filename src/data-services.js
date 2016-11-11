@@ -31,7 +31,7 @@ db.todos.get = (list, callback) => {
       db.todos.lists[id] = db.todos.child(id);
       // register a listener
       db.todos.lists[id].on('value', snap => {
-        console.log ('\n***** User update todo\n');
+        console.log ('User update todo');
         const todo = snap.val();
         if (todo) {
           todosList[id] = todo;  

@@ -9,11 +9,16 @@ import { ERROR, NODE_USER } from '../constants';
 /* action types */
 export const USER = {
   /* synchronous actions */
-  UPDATE        : {
-    AUTH        : 'user.update.auth',
-    MESSAGE     : 'user.update.msg',
-    TODOS        : 'user.update.todos'
+  AUTH          : {
+    UPDATE      : 'user.auth.update'
   },
+  MESSAGES     : {
+    UPDATE      : 'user.messages.update'
+  },
+  TODOS         : {
+    UPDATE      : 'user.todos.update'
+  },
+  
   /* asynchronous actions */
   SIGNIN        : 'user.signin',
   SIGNOUT       : 'user.signout',
@@ -24,22 +29,28 @@ export const USER = {
 export const user = {
 
   /* synchronous actions */
-  update  : {
-    auth (user) {
+  auth  : {
+    update (user) {
       return {
-        type    : USER.UPDATE.AUTH,
+        type    : USER.AUTH.UPDATE,
         payload : { user }
       };
-    },
-    messages (messages) {
+    }
+  },
+
+  messages : {
+    update (messages) {
       return {
-        type    : USER.UPDATE.MESSAGE,
+        type    : USER.MESSAGES.UPDATE,
         payload : { messages }
       };
     },
-    todos (todos) {
+  },
+
+  todos : {
+    update (todos) {
       return {
-        type    : USER.UPDATE.TODOS,
+        type    : USER.TODOS.UPDATE,
         payload : { todos }
       };
     }, 
@@ -87,9 +98,9 @@ export const user = {
           const user = auth.currentUser;
           const msg    = userPrivateData.msg;
           const todos  = userPrivateData.todos;
-          dispatch(this.update.auth(user));
-          dispatch(this.update.messages(msg));
-          dispatch(this.update.todos(todos));
+          dispatch(this.auth.update(user));
+          dispatch(this.messages.update(msg));
+          dispatch(this.todos.update(todos));
           dispatch(data.received(NODE_USER));
           resolve(user);
         });
