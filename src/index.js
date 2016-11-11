@@ -27,8 +27,8 @@ auth.onAuthStateChanged( user => {
       console.log ('\n# Fetching... ---------------------------------------');
       store.dispatch(action.todos.fetch()).then(todosList => {
         console.log ('\n# Fetched Todos List ------------------------------');
-        console.log (todosList);
-        store.dispatch(action.todos.add('Learn firebase plus redux'));
+        console.log (store.getState());
+        //store.dispatch(action.todos.add('Learn firebase plus redux'));
       });
     });
   } else {

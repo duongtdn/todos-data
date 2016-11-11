@@ -9,7 +9,11 @@ import { ERROR, NODE_USER } from '../constants';
 /* action types */
 export const USER = {
   /* synchronous actions */
-  UPDATE        : 'user.update',
+  UPDATE        : {
+    AUTH        : 'user.update.auth',
+    MESSAGE     : 'user.update.msg',
+    TODOS        : 'user.update.todos'
+  },
   /* asynchronous actions */
   SIGNIN        : 'user.signin',
   SIGNOUT       : 'user.signout',
@@ -20,12 +24,27 @@ export const USER = {
 export const user = {
 
   /* synchronous actions */
-  update(user) {
-    return {
-      type    : USER.UPDATE,
-      payload : { user }
-    }
+  update  : {
+    auth (user) {
+      return {
+        type    : USER.UPDATE.AUTH,
+        payload : { user }
+      };
+    },
+    messages (messages) {
+      return {
+        type    : USER.UPDATE.MESSAGE,
+        payload : { messages }
+      };
+    },
+    todos (todos) {
+      return {
+        type    : USER.UPDATE.TODOS,
+        payload : { todos }
+      };
+    }, 
   },
+
 
    /* asynchronous actions */
 
@@ -66,9 +85,11 @@ export const user = {
       return new Promise((resolve, reject) => {
         db.users.getData(userPrivateData => {
           const user = auth.currentUser;
-          user.msg    = userPrivateData.msg;
-          user.todos  = userPrivateData.todos;
-          dispatch(this.update(user));
+          const msg    = userPrivateData.msg;
+          const todos  = userPrivateData.todos;
+          dispatch(this.update.auth(user));
+          dispatch(this.update.messages(msg));
+          dispatch(this.update.todos(todos));
           dispatch(data.received(NODE_USER));
           resolve(user);
         });

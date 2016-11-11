@@ -16,7 +16,7 @@ export const TODOS = {
   /* asynchronous actions */
   FETCH     : 'todos.fetch',
   ADD       : 'todos.add',
-  remove    : 'todos.remove'
+  REMOVE    : 'todos.remove'
 }
 
 /* action creators */
