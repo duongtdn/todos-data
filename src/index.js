@@ -4,9 +4,9 @@ import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
 import auth from './auth-services';
-
 import rootReducer from './reducers';
 import * as action from './actions';
+import messenger from './messenger';
 
 const Users = {
   'duong' : 'VgLf702x7bXZeus6Rwvohre208e2',
@@ -28,12 +28,18 @@ auth.onAuthStateChanged( user => {
       store.dispatch(action.todos.fetch()).then(todosList => {
         console.log ('\n# Fetched Todos List ------------------------------');
         console.log (store.getState());
-        //store.dispatch(action.todos.add('Learn firebase plus redux'));
+        console.log ('\n# Adding new todo ------------------------------');
+        const todoId = store.dispatch(action.todos.add('Implement message system'));
+        messenger.inviteTodo({
+          collaborator : Users.duong,
+          todoId : todoId
+        });
+        console.log (store.getState());
       });
     });
   } else {
     console.log ('\n# User is not logged ------------------------------------');
-    store.dispatch(action.user.update(null)); 
+    store.dispatch(action.user.update(null,null,null)); 
   }    
 });
 

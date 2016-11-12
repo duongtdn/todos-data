@@ -1,10 +1,11 @@
 "use strict"
 
-import { STATUS, ERROR, OWNER, NODE_TODOS } from '../constants';
-import db from '../data-services';
-import auth from '../auth-services';
-import { data } from './data';
-import { error } from './error';
+import { STATUS, ERROR, OWNER, NODE_TODOS } from '../constants'
+import { getTime } from '../util'
+import db from '../data-services'
+import auth from '../auth-services'
+import { data } from './data'
+import { error } from './error'
 
 
 /* action types */
@@ -88,7 +89,7 @@ export const todos = {
         /* add todo to todos db */
         if (!users) { users = {}; }
         users[auth.currentUser.uid] = OWNER;
-        const timestamp = new Date().getTime();
+        const timestamp = getTime();
         const todoRef = db.todos.add({
           text       : text,
           users      : users,

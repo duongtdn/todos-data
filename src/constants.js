@@ -3,7 +3,8 @@
 export const STATUS = {
   ACTIVE    : 'active',
   COMPLETED : 'completed',
-  CANCELLED : 'cancelled'
+  CANCELLED : 'cancelled',
+  UNREAD    : 'unread'
 }
 
 export const ERROR = {
@@ -22,6 +23,14 @@ export const FETCH = {
   FETCHING  : 'fetching',
   SUCCESS   : 'success',
   FAILURE   : 'failure'
+}
+
+export const TYPE = {
+  NOTIFICATION : 'notification'
+}
+
+export const SUBJECT = {
+  SHARE_TODO   : 'todo.share'
 }
 
 export const OWNER = 'owner';

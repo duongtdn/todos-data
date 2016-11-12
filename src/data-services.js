@@ -31,7 +31,7 @@ db.todos.get = (list, callback) => {
       db.todos.lists[id] = db.todos.child(id);
       // register a listener
       db.todos.lists[id].on('value', snap => {
-        console.log ('User update todo');
+        console.log (`User update todo : ${id}`);
         const todo = snap.val();
         if (todo) {
           todosList[id] = todo;  
@@ -67,9 +67,9 @@ db.users.addTodo = (todo, content) => {
 
 db.users.getData = callback => {
   const user = fb.auth().currentUser;
-  console.log('db.users.getData : auth failed');
+  //console.log('db.users.getData : auth failed');
   if (user) {
-    console.log('db.users.getData : auth passed');
+    //console.log('db.users.getData : auth passed');
     db.users.child(user.uid).on('value', snapshot => {
       callback(snapshot.val());
     });
@@ -80,11 +80,11 @@ db.users.getData = callback => {
 
 db.users.getTodosList = callback => {
   const user = fb.auth().currentUser;
-  console.log('db.users.getTodosList : auth failed');
+  //console.log('db.users.getTodosList : auth failed');
   if (user) {
-    console.log('db.users.getTodosList : auth passed');
+    //console.log('db.users.getTodosList : auth passed');
     db.users.child(user.uid).child('todos').on('value', snapshot => {
-      console.log ('\n***** User Todo List changed\n');
+      //console.log ('\n***** User Todo List changed\n');
       callback(snapshot.val());
     });
   } else {

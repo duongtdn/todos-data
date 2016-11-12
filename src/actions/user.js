@@ -4,18 +4,22 @@ import auth from '../auth-services';
 import db from '../data-services';
 import { data } from './data';
 import { error } from './error';
-import { ERROR, NODE_USER } from '../constants'; 
+import { STATUS, ERROR, NODE_USER } from '../constants'; 
+
 
 /* action types */
 export const USER = {
-  /* synchronous actions */
+
   AUTH          : {
+    /* synchronous actions */
     UPDATE      : 'user.auth.update'
   },
   MESSAGES     : {
+    /* synchronous actions */
     UPDATE      : 'user.messages.update'
   },
   TODOS         : {
+    /* synchronous actions */
     UPDATE      : 'user.todos.update'
   },
   
@@ -23,13 +27,14 @@ export const USER = {
   SIGNIN        : 'user.signin',
   SIGNOUT       : 'user.signout',
   LOAD          : 'user.load',
+  UPDATE        : 'user.update',
 }
 
 /* action creators */
 export const user = {
 
-  /* synchronous actions */
   auth  : {
+    /* synchronous actions */
     update (user) {
       return {
         type    : USER.AUTH.UPDATE,
@@ -39,15 +44,18 @@ export const user = {
   },
 
   messages : {
+    /* synchronous actions */
     update (messages) {
       return {
         type    : USER.MESSAGES.UPDATE,
         payload : { messages }
       };
     },
+
   },
 
   todos : {
+    /* synchronous actions */
     update (todos) {
       return {
         type    : USER.TODOS.UPDATE,
@@ -57,7 +65,7 @@ export const user = {
   },
 
 
-   /* asynchronous actions */
+  /* asynchronous actions */
 
   signIn(email, password) {
 
@@ -94,18 +102,25 @@ export const user = {
     return dispatch => {
       dispatch(data.request(NODE_USER));
       return new Promise((resolve, reject) => {
+        // reactive update if user data change
         db.users.getData(userPrivateData => {
-          const user = auth.currentUser;
+          const usr   = auth.currentUser;
           const msg    = userPrivateData.msg;
           const todos  = userPrivateData.todos;
-          dispatch(this.auth.update(user));
-          dispatch(this.messages.update(msg));
-          dispatch(this.todos.update(todos));
+          dispatch(this.update(usr, msg, todos));
           dispatch(data.received(NODE_USER));
           resolve(user);
         });
       });       
     };
+  },
+
+  update(usr, msg, todos) {
+    return dispatch => {
+      dispatch(this.auth.update(usr));
+      dispatch(this.messages.update(msg));
+      dispatch(this.todos.update(todos));
+    }
   }
 
 }
