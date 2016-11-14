@@ -34,6 +34,7 @@ export const SUBJECT = {
 }
 
 export const OWNER = 'owner';
+export const COLLABORATOR = 'collaborator';
 
 export const NODE_TODOS = 'listTodos';
 export const NODE_USER  = 'userDATA';

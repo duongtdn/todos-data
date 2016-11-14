@@ -68,7 +68,7 @@ export const todos = {
         
         // The function called by the thunk middleware can return a value,
         // that is passed on as the return value of the dispatch method.
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           db.users.getTodosList( list => {
             db.todos.get(list, todosList => {
               dispatch(todos.update(todosList));

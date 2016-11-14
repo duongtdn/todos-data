@@ -19,22 +19,44 @@ const store = createStore(
     thunkMiddleware
   )
 );
-
-auth.onAuthStateChanged( user => {
-  if (user) {
+let msgId;
+auth.onAuthStateChanged( usr => {
+  if (usr) {    
     console.log ('\n# User is logged ----------------------------------------');
     store.dispatch(action.user.load()).then( user => {
       console.log ('\n# Fetching... ---------------------------------------');
       store.dispatch(action.todos.fetch()).then(todosList => {
         console.log ('\n# Fetched Todos List ------------------------------');
-        console.log (store.getState());
-        console.log ('\n# Adding new todo ------------------------------');
-        const todoId = store.dispatch(action.todos.add('Implement message system'));
-        messenger.inviteTodo({
-          collaborator : Users.duong,
-          todoId : todoId
-        });
-        console.log (store.getState());
+        displayStore();
+        // mai
+        if (usr.uid === Users.mai) {
+          console.log ('\n# Adding new todo ------------------------------');
+          const todoId = store.dispatch(action.todos.add('Implement message system'));
+          msgId = messenger.inviteTodo({
+            collaborator : Users.duong,
+            todoId : todoId
+          });
+          displayStore();
+          store.dispatch(action.user.signOut()).then(() => {
+            console.log ('\n# Logged out');   
+            console.log ('\n# Re-Login as Duong... -----------------------------------------');
+            store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456')).catch(err => console.log (err));
+          });
+        }
+        // duong
+        if (usr.uid === Users.duong) {
+          // accpet todo                    
+          const msg = store.getState().user.messages[msgId];          
+          if (msg) {
+            console.log('\n#Accept invited todo');
+            messenger.acceptTodo(msgId, msg);
+            displayStore();
+          } else {
+            console.log ('\n#No message found');           
+          }
+          
+
+        }
       });
     });
   } else {
@@ -46,15 +68,14 @@ auth.onAuthStateChanged( user => {
 console.log ('\n# Initial State ---------------------------------------------');
 console.log (store.getState());
 
-
-// const unsubscribe = store.subscribe( () => {
-//   console.log('todos');
-//   console.log(store.getState().todos)
-//   if (store.getState().user && store.getState().user.todos) {
-//     console.log('user todos');
-//     console.log(store.getState().user.todos);
-//   } 
-// });
+function displayStore() {
+  console.log ('Todos :');
+  console.log (store.getState().todos);
+  console.log('User.messages');
+  console.log (store.getState().user.messages);
+  console.log('User.todos');
+  console.log (store.getState().user.todos);
+}
 
 console.log ('\n# Login... --------------------------------------------------');
 // attem to login with wrong pass
@@ -62,7 +83,7 @@ store.dispatch(action.user.signIn('mainth@stormgle.com','0123456'))
   .then( (dat) => {
     console.log ('\n# Logged Failed -----------------------------------------');
     // console.log(store.getState());
-    console.log ('\n# Re-Login... -------------------------------------------');
+    console.log ('\n# Re-Login as Mai... -----------------------------------------');
     // re-login with right pass
     store.dispatch(action.user.signIn('mainth@stormgle.com','123456')).catch(err => console.log (err));
   }).catch(err => console.log (err));
