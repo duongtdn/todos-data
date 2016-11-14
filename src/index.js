@@ -8,6 +8,8 @@ import rootReducer from './reducers';
 import * as action from './actions';
 import messenger from './messenger';
 
+import db from './data-services';
+
 const Users = {
   'duong' : 'VgLf702x7bXZeus6Rwvohre208e2',
   'mai' : 'MrrsU8OMAFMre1bOdLgWTZdBqD62'
@@ -45,16 +47,21 @@ auth.onAuthStateChanged( usr => {
         }
         // duong
         if (usr.uid === Users.duong) {
-          // accpet todo                    
+          // accpet todo   
+          // msgId = '-KWZyiBvIw6rfn2DTH0V';                 
           const msg = store.getState().user.messages[msgId];          
           if (msg) {
             console.log('\n#Accept invited todo');
             messenger.acceptTodo(msgId, msg);
+            //  console.log('\n#Ignore invited todo');
+            // messenger.ignoreTodo(msgId, msg);
             displayStore();
           } else {
             console.log ('\n#No message found');           
           }
-          
+
+          // this action should Failed
+          db.ref(`tasks/-KW0dw919AFeQjNlqIKu/users/${usr.uid}`).set('collaborator');
 
         }
       });
@@ -85,7 +92,8 @@ store.dispatch(action.user.signIn('mainth@stormgle.com','0123456'))
     // console.log(store.getState());
     console.log ('\n# Re-Login as Mai... -----------------------------------------');
     // re-login with right pass
-    store.dispatch(action.user.signIn('mainth@stormgle.com','123456')).catch(err => console.log (err));
+    // store.dispatch(action.user.signIn('mainth@stormgle.com','123456')).catch(err => console.log (err));
+    store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456')).catch(err => console.log (err));
   }).catch(err => console.log (err));
 
 // Stop listening to state updates

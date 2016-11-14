@@ -8,9 +8,11 @@ export const STATUS = {
 }
 
 export const ERROR = {
-  SIGNIN      : 'error.signIn',
-  SIGNOUT     : 'error.signOut',
-  NOT_AUTHEN  : 'error.notAuthen'
+  SIGNIN              : 'error.signIn',
+  SIGNOUT             : 'error.signOut',
+  NOT_AUTHEN          : 'error.notAuthen',
+  PERMISSION_DENINED  : 'error.denied',
+  INVALID             : 'error.invalid'
 }
 
 export const SHOW = {

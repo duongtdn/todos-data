@@ -3,6 +3,7 @@
 import { getTime } from './util'
 import auth from './auth-services';
 import db from './data-services';
+import { ERROR } from './constants'
 
 import { STATUS, TYPE, SUBJECT, COLLABORATOR } from './constants'; 
 
@@ -43,15 +44,8 @@ export default {
   acceptTodo (msgId, msg = null) {
     const user = auth.currentUser;
     // check permission, message type and subject
-    if (!msg.to || msg.to !== user.uid) {
-      throw 'Permission denied';
-    }    
-    if (!msg.type || msg.type !== TYPE.NOTIFICATION) {
-      throw 'Invalid message';
-    }
-    if (!msg.subject || msg.subject !== SUBJECT.SHARE_TODO) {
-      throw 'Invalid message';
-    } 
+    checkPermission(user, msg);
+
     const todoId = msg.content; 
     if (todoId) {
       // update role in todo and add todo into user todos list
@@ -63,4 +57,37 @@ export default {
   
   },  
 
+  ignoreTodo(msgId, msg = null) {
+    const user = auth.currentUser;
+    // check permission, message type and subject
+    checkPermission(user, msg);
+
+    const todoId = msg.content; 
+    if (todoId) {
+      // remove user in todo 
+      db.todos.child(todoId).child('users').child(user.uid).set(null);
+      // delete message
+      db.users.child(user.uid).child('msg').child(msgId).set(null);
+    }
+  },
+
+}
+
+function checkPermission(user, msg) {
+  if (msg === null || msg === undefined) {
+    throw ERROR.INVALID;
+  }
+  if (!msg.to || msg.to !== user.uid) {
+    throw ERROR.PERMISSION_DENINED;
+  }    
+  if (!msg.type || msg.type !== TYPE.NOTIFICATION) {
+    throw ERROR.INVALID;
+  }
+  if (!msg.subject || msg.subject !== SUBJECT.SHARE_TODO) {
+    throw ERROR.INVALID;
+  } 
+  if (!msg.content) {
+    throw ERROR.INVALID;
+  }
+  return true;
 }
