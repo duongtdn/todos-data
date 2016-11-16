@@ -70,16 +70,20 @@ export const user = {
   signIn(email, password) {
 
     return dispatch => {      
-      return auth.signInWithEmailAndPassword(email, password)
-        .then( user => {
-          // successful signed in, clear error flag if any 
-          dispatch(error.clear(ERROR.SIGNIN));
-          dispatch(error.clear(ERROR.NOT_AUTHEN));  
-        })
-        .catch( err => {
-          // sign in error
-          dispatch(error.update(ERROR.SIGNIN, err));
-        });
+      return new Promise((resolve, reject) => {
+        return auth.signInWithEmailAndPassword(email, password)
+          .then( user => {
+            // successful signed in, clear error flag if any 
+            dispatch(error.clear(ERROR.SIGNIN));
+            dispatch(error.clear(ERROR.NOT_AUTHEN)); 
+            resolve(user); 
+          })
+          .catch( err => {
+            // sign in error
+            dispatch(error.update(ERROR.SIGNIN, err));
+            reject(err);
+          });
+      });
     } 
 
   },

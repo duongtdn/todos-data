@@ -57,11 +57,13 @@ auth.onAuthStateChanged( usr => {
             // messenger.ignoreTodo(msgId, msg);
             displayStore();
           } else {
-            console.log ('\n#No message found');           
+            console.log ('\n#No message found');     
+            console.log ('\n# Adding new todo ------------------------------'); 
+            const todoId = store.dispatch(action.todos.add('Check with security system'));     
           }
 
           // this action should Failed
-          db.ref(`tasks/-KW0dw919AFeQjNlqIKu/users/${usr.uid}`).set('collaborator');
+          // db.ref(`tasks/-KW0dw919AFeQjNlqIKu/users/${usr.uid}`).set('collaborator');
 
         }
       });
@@ -85,16 +87,12 @@ function displayStore() {
 }
 
 console.log ('\n# Login... --------------------------------------------------');
-// attem to login with wrong pass
+
 store.dispatch(action.user.signIn('mainth@stormgle.com','0123456'))
-  .then( (dat) => {
-    console.log ('\n# Logged Failed -----------------------------------------');
-    // console.log(store.getState());
-    console.log ('\n# Re-Login as Mai... -----------------------------------------');
-    // re-login with right pass
-    // store.dispatch(action.user.signIn('mainth@stormgle.com','123456')).catch(err => console.log (err));
-    store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456')).catch(err => console.log (err));
-  }).catch(err => console.log (err));
+// .then( usr => console.log(usr) )
+// .catch(err => console.log(err) );
+// store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
+
 
 // Stop listening to state updates
 // unsubscribe();
