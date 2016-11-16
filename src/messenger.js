@@ -57,7 +57,7 @@ export default {
   
   },  
 
-  ignoreTodo(msgId, msg = null) {
+  declineTodo(msgId, msg = null) {
     const user = auth.currentUser;
     // check permission, message type and subject
     checkPermission(user, msg);

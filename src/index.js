@@ -48,13 +48,13 @@ auth.onAuthStateChanged( usr => {
         // duong
         if (usr.uid === Users.duong) {
           // accpet todo   
-          // msgId = '-KWZyiBvIw6rfn2DTH0V';                 
+          msgId = '-KWerr3FO4lReNslTkWO';                 
           const msg = store.getState().user.messages[msgId];          
           if (msg) {
             console.log('\n#Accept invited todo');
             messenger.acceptTodo(msgId, msg);
             //  console.log('\n#Ignore invited todo');
-            // messenger.ignoreTodo(msgId, msg);
+            // messenger.declineTodo(msgId, msg);
             displayStore();
           } else {
             console.log ('\n#No message found');     
