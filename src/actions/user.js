@@ -109,8 +109,8 @@ export const user = {
         // reactive update if user data change
         db.users.getData(userPrivateData => {
           const usr   = auth.currentUser;
-          const msg    = userPrivateData.msg || null;
-          const todos  = userPrivateData.todos || null;
+          const msg    = (userPrivateData) ? userPrivateData.msg || null : null;
+          const todos  = (userPrivateData) ? userPrivateData.todos || null : null;
           dispatch(this.update(usr, msg, todos));
           dispatch(data.received(NODE_USER));
           resolve(user);
