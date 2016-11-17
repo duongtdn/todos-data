@@ -7,40 +7,74 @@ import { ERROR } from './constants'
 
 import { STATUS, TYPE, SUBJECT, COLLABORATOR } from './constants'; 
 
+export const TEMPLATE = {
+  INVITE_TODO : 'inviteTodo'
+};
+
+export const MESSAGES = {
+  STATUS : {
+    UNREAD        : 'unread'
+  },
+  TYPE : {
+    NOTIFICATION  : 'notification'
+  },
+  SUBJECT: {
+    SHARE_TODO    : 'todo.share'
+  }
+};
+
 export default {
+
+  msgStruct : {
+    status    : '',
+    from      : '',
+    to        : [],
+    createdAt : null,
+    type      : '',
+    subject   : '',
+    content   : ''
+  },
   
-  send ({to = '', type = '', subject = 'none', content = ''}) {
-    const user = auth.currentUser;
-    const msgRef = db.users.child(to).child('msg').push();
-    msgRef.set({
-      status    : STATUS.UNREAD,
-      from      : user.uid,
-      to        : to,
-      createdAt : getTime(),
-      type      : type,
-      subject   : subject,
-      content   : content 
-    });
-    return msgRef;
+  template(name) {
+    switch (name) {
+      
+      case TEMPLATE.INVITE_TODO :
+
+        this.msgStruct.type = MESSAGES.TYPE.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.SHARE_TODO;
+
+        return this;
+
+      default :
+        return this;
+    }
+
   },
 
-  inviteTodo ({collaborator = '', todoId = ''}) {
-    /* send invitation message
-       need to check whether collaborator is already invited before invoke this 
-       function
-    */
-    const msgRef = this.send({
-      to      : collaborator,
-      type    : TYPE.NOTIFICATION,
-      subject : SUBJECT.SHARE_TODO,
-      content : todoId
-    });
-    /* update collaborator in todo as invited */
-    db.todos.child(todoId).child('users').child(collaborator)
-      .set(`invited.${msgRef.key}`);
-    return msgRef.key;
+
+  create ({receivers = null, type = null, subject = null, content = null}) {
+    
+    const uid = auth.currentUser.uid;
+    this.msgStruct.status = MESSAGES.STATUS.UNREAD;
+    this.msgStruct.from = uid;
+    this.msgStruct.createdAt = getTime();
+    // need to validate to makesure receiver list is array 
+    if (receivers) {
+      this.msgStruct.to = receivers;
+    }
+    if (type) {
+      this.msgStruct.type = type;
+    }
+    if (subject) {
+      this.msgStruct.subject = subject;
+    }
+    if (content) {
+      this.msgStruct.content = content;
+    }
+    return this.msgStruct;
   },
 
+  
   acceptTodo (msgId, msg = null) {
     const user = auth.currentUser;
     // check permission, message type and subject
@@ -69,6 +103,19 @@ export default {
       // delete message
       db.users.child(user.uid).child('msg').child(msgId).set(null);
     }
+  },
+
+  _clear() {
+    this.msgStruct = {
+      status    : '',
+      from      : '',
+      to        : [],
+      createdAt : null,
+      type      : '',
+      subject   : '',
+      content   : ''
+    };
+    return this;
   },
 
 }

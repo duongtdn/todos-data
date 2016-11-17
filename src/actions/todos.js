@@ -1,11 +1,12 @@
 "use strict"
 
-import { STATUS, ERROR, OWNER, NODE_TODOS } from '../constants'
+import { STATUS, ERROR, OWNER, NODE_TODOS, NODE_USER } from '../constants'
 import { getTime } from '../util'
 import db from '../data-services'
 import auth from '../auth-services'
 import { data } from './data'
 import { error } from './error'
+import messages, {TEMPLATE} from '../messenger';
 
 
 /* action types */
@@ -17,7 +18,8 @@ export const TODOS = {
   /* asynchronous actions */
   FETCH     : 'todos.fetch',
   ADD       : 'todos.add',
-  REMOVE    : 'todos.remove'
+  REMOVE    : 'todos.remove',
+  SHARE     : 'todos.share'
 }
 
 /* action creators */
@@ -116,6 +118,35 @@ export const todos = {
         dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
       }
     }
+  },
+
+  share({users = [], id = ''}) {
+
+    return dispatch => {
+
+      const updates = {};
+      // create an invitation message
+      const message = messages.template(TEMPLATE.INVITE_TODO).create({
+        receivers : users,
+        content   : id
+      });
+
+      // prepare update
+      users.forEach(user => {
+        const msgKey = db.users.child(user).child('msg').push().key;
+        updates[`users/${user}/msg/${msgKey}`] = message;
+        updates[`todos/${id}/users/${user}`] = 'invited';
+      });
+
+      // update
+      dispatch(data.uploading(NODE_TODOS));
+      dispatch(data.uploading(NODE_USER));
+      db.root.update(updates).then( () => {
+        dispatch(data.uploaded(NODE_TODOS));
+        dispatch(data.uploaded(NODE_USER));
+      });
+    }
+    
   }
 
 }

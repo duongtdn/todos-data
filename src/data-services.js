@@ -4,6 +4,7 @@ import { fb } from './firebase-services';
         
 const db = fb.database();
 
+db.root  = db.ref();
 db.todos = db.ref('todos');
 db.users = db.ref('users');
 
