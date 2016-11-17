@@ -94,7 +94,7 @@ export const todos = {
         const timestamp = getTime();
         const todoRef = db.todos.add({
           text       : text,
-          users      : users,
+          share      : users,
           createdAt  : timestamp,
           status     : STATUS.ACTIVE
         });  
@@ -135,7 +135,7 @@ export const todos = {
       users.forEach(user => {
         const msgKey = db.users.child(user).child('msg').push().key;
         updates[`users/${user}/msg/${msgKey}`] = message;
-        updates[`todos/${id}/users/${user}`] = 'invited';
+        updates[`todos/${id}/share/${user}`] = 'invited';
       });
 
       // update
