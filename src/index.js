@@ -60,14 +60,12 @@ auth.onAuthStateChanged( usr => {
         if (usr.uid === Users.duong) {
           
           // accept todo   
-          // const msgId = '-KWerr3FO4lReNslTkWO';                 
-          // const msg = store.getState().user.messages[msgId];  
-          const msg = false;        
+          const msgId = '-KWp6VLGUnQXGBdjV2MN';                 
+          const msg = store.getState().user.messages[msgId];  
+          // const msg = false;        
           if (msg) {
             console.log('\n#Accept invited todo');
-            // messenger.acceptTodo(msgId, msg);
-            //  console.log('\n#Ignore invited todo');
-            // messenger.declineTodo(msgId, msg);
+            store.dispatch(action.todos.accept(msg));
             displayStore();
           } else {
             console.log ('\n#No message found');         
@@ -102,10 +100,10 @@ function displayStore() {
 
 console.log ('\n# Login... --------------------------------------------------');
 
-store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
+// store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
 // .then( usr => console.log(usr) )
 // .catch(err => console.log(err) );
-// store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
+store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
 
 
 // // Stop listening to state updates

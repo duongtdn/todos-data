@@ -6,7 +6,7 @@ import db from '../data-services'
 import auth from '../auth-services'
 import { data } from './data'
 import { error } from './error'
-import messages, {TEMPLATE} from '../messenger';
+import messages, {TEMPLATE, MESSAGES} from '../messenger';
 
 
 /* action types */
@@ -152,8 +152,80 @@ export const todos = {
     
   },
 
-  accept() {
+  accept(message) {
+    return dispatch => {
+      const uid = auth.currentUser.uid;
+      _validateMessage(uid, message);
+      const todoId = message.content;
+      const updates = {};
+      if (todoId) {
+        // update role in todo, add todo in user todo list, remove message
+        updates[`todos/${todoId}/share/${uid}`] = 'collaborator';
+        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.ACTIVE, role : 'collaborator'};
+        updates[`users/${uid}/msg/${message.id}`] = null;
+        // update
+        dispatch(data.uploading(NODE_TODOS));
+        dispatch(data.uploading(NODE_USER));
+        db.root.update(updates).then( () => {
+          dispatch(data.uploaded(NODE_TODOS));
+          dispatch(data.uploaded(NODE_USER));
+        });
+      }  
+    }
+  },
 
+  decline(message) {
+    return dispatch => {
+      const uid = auth.currentUser.uid;
+      _validateMessage(uid, message);
+      const todoId = message.content;
+      const updates = {};
+      if (todoId) {
+        // remove user in todo, remove message
+        updates[`todos/${todoId}/share/${uid}`] = null;
+        updates[`users/${uid}/msg/${message.id}`] = null;
+        // update
+        dispatch(data.uploading(NODE_TODOS));
+        dispatch(data.uploading(NODE_USER));
+        db.root.update(updates).then( () => {
+          dispatch(data.uploaded(NODE_TODOS));
+          dispatch(data.uploaded(NODE_USER));
+        });
+      }
+    }
   }
+
+}
+
+function _validateMessage(uid, msg) {
+  
+  if (msg === null || msg === undefined) {
+    throw ERROR.INVALID;
+  }
+
+  let checkUID = false;
+  msg.to.forEach( usr => {
+    if (usr === uid) {
+      checkUID = true;
+      return;
+    }
+  });
+  if (!checkUID) {
+    throw ERROR.PERMISSION_DENINED;
+  }
+
+  if (!msg.type || msg.type !== MESSAGES.TYPE.NOTIFICATION) {
+    throw ERROR.INVALID;
+  }
+
+  if (!msg.subject || msg.subject !== MESSAGES.SUBJECT.SHARE_TODO) {
+    throw ERROR.INVALID;
+  }
+
+  if (!msg.content) {
+    throw ERROR.INVALID;
+  }
+
+  return true;
 
 }
