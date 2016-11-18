@@ -77,7 +77,7 @@ auth.onAuthStateChanged( usr => {
           // const todoId = store.dispatch(action.todos.add('Check with security system')); 
 
           // this action should Failed
-          // db.ref(`tasks/-KW0dw919AFeQjNlqIKu/users/${usr.uid}`).set('collaborator');
+          // db.ref(`todos/-KWoP_T9TjNrH9G-asqS/share/${usr.uid}`).set('collaborator');
 
         }
       });

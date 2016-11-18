@@ -19,7 +19,9 @@ export const TODOS = {
   FETCH     : 'todos.fetch',
   ADD       : 'todos.add',
   REMOVE    : 'todos.remove',
-  SHARE     : 'todos.share'
+  SHARE     : 'todos.share',
+  ACCEPT    : 'todos.accept',
+  DECLINE   : 'todos.decline'
 }
 
 /* action creators */
@@ -134,6 +136,7 @@ export const todos = {
       // prepare update
       users.forEach(user => {
         const msgKey = db.users.child(user).child('msg').push().key;
+        message.id = msgKey;
         updates[`users/${user}/msg/${msgKey}`] = message;
         updates[`todos/${id}/share/${user}`] = 'invited';
       });
@@ -147,6 +150,10 @@ export const todos = {
       });
     }
     
+  },
+
+  accept() {
+
   }
 
 }

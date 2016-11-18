@@ -14,6 +14,7 @@ db.todos.lists = {};
 
 db.todos.add = content => {
   const ref = db.todos.push();
+  content['id'] = ref.key;
   ref.set(content);
   return ref;
 }

@@ -26,6 +26,7 @@ export const MESSAGES = {
 export default {
 
   msgStruct : {
+    id        : '',
     status    : '',
     from      : '',
     to        : [],
