@@ -19,7 +19,9 @@ export const MESSAGES = {
     NOTIFICATION  : 'notification'
   },
   SUBJECT: {
-    SHARE_TODO    : 'todo.share'
+    SHARE_TODO    : 'todo.share',
+    TODO_CHANGED  : 'todo.changed',
+    TOD_COMPLETED : 'todo.completed'
   }
 };
 
@@ -43,6 +45,13 @@ export default {
 
         this.msgStruct.type = MESSAGES.TYPE.NOTIFICATION;
         this.msgStruct.subject = MESSAGES.SUBJECT.SHARE_TODO;
+
+        return this;
+
+      case TEMPLATE.COMPLETE_TODO :
+
+        this.msgStruct.type = MESSAGES.TYPE.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.TOD_COMPLETED;
 
         return this;
 

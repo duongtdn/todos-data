@@ -1,6 +1,6 @@
 "use strict"
 
-import { STATUS, ERROR, OWNER, NODE_TODOS, NODE_USER } from '../constants'
+import { STATUS, ERROR, OWNER, COLLABORATOR, NODE_TODOS, NODE_USER } from '../constants'
 import { getTime } from '../util'
 import db from '../data-services'
 import auth from '../auth-services'
@@ -12,16 +12,15 @@ import messages, {TEMPLATE, MESSAGES} from '../messenger';
 /* action types */
 export const TODOS = {
   /* synchronous actions */
-  COMPLETE  : 'todos.complete',
-  CANCEL    : 'todos.cancel',
   UPDATE    : 'todos.update',
   /* asynchronous actions */
   FETCH     : 'todos.fetch',
   ADD       : 'todos.add',
-  REMOVE    : 'todos.remove',
+  DELETE    : 'todos.delete',
+  COMPLETE  : 'todos.complete',
   SHARE     : 'todos.share',
   ACCEPT    : 'todos.accept',
-  DECLINE   : 'todos.decline'
+  DECLINE   : 'todos.decline',
 }
 
 /* action creators */
@@ -29,27 +28,6 @@ export const TODOS = {
 export const todos = {
 
   /* synchronous actions */
-
-  complete(id, uid) {
-    return {
-      type    : TODOS.COMPLETE,
-      payload : {
-        id            : id,
-        completedBy   : uid,
-        completedAt   : new Date(),
-      }
-    }
-  },
-
-  cancel(id, uid) {
-    return {
-      type    : TODOS.CANCEL,
-      payload : {
-        id            : id,
-        cancelledBy   : uid
-      }
-    }
-  },
 
   update(data) {
     return {
@@ -112,13 +90,42 @@ export const todos = {
 
   },
 
-  remove(id) {
+  delete(id) {
     return dispatch => {
       if (auth.currentUser) {
         /* to be implemented after message system work */
       } else {
         dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
       }
+    }
+  },
+
+  complete(todo) {
+    return dispatch => {
+      const uid = auth.currentUser.uid;
+      const updates = {};
+      const stakeholders = [];
+      for (let user in todo.share) {
+        if (todo.share[user] === COLLABORATOR) {
+          stakeholders.push(user);
+        }
+      }
+      // change status of todo as complete, then broadcast a message 
+      // to all stakeholders if any
+      updates[`todos/${todo.id}/status`] = STATUS.COMPLETED;
+      if (stakeholders.length > 0) {
+        const message = messages.template(TEMPLATE.COMPLETE_TODO).create({
+          receivers : stakeholders,
+          content   : todo.id
+        });
+        stakeholders.forEach(user => {
+          const msgKey = db.users.child(user).child('msg').push().key;
+          message.id = msgKey;
+          updates[`users/${user}/msg/${msgKey}`] = message;
+        });
+      }
+      // update
+      _updateTodoAndUser (dispatch, updates);
     }
   },
 
@@ -142,12 +149,7 @@ export const todos = {
       });
 
       // update
-      dispatch(data.uploading(NODE_TODOS));
-      dispatch(data.uploading(NODE_USER));
-      db.root.update(updates).then( () => {
-        dispatch(data.uploaded(NODE_TODOS));
-        dispatch(data.uploaded(NODE_USER));
-      });
+      _updateTodoAndUser (dispatch, updates);
     }
     
   },
@@ -161,15 +163,10 @@ export const todos = {
       if (todoId) {
         // update role in todo, add todo in user todo list, remove message
         updates[`todos/${todoId}/share/${uid}`] = 'collaborator';
-        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.ACTIVE, role : 'collaborator'};
+        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.ACTIVE, role : COLLABORATOR};
         updates[`users/${uid}/msg/${message.id}`] = null;
         // update
-        dispatch(data.uploading(NODE_TODOS));
-        dispatch(data.uploading(NODE_USER));
-        db.root.update(updates).then( () => {
-          dispatch(data.uploaded(NODE_TODOS));
-          dispatch(data.uploaded(NODE_USER));
-        });
+        _updateTodoAndUser (dispatch, updates);
       }  
     }
   },
@@ -193,8 +190,19 @@ export const todos = {
         });
       }
     }
-  }
+  },
 
+  
+
+}
+
+function _updateTodoAndUser (dispatch, updates) {
+    dispatch(data.uploading(NODE_TODOS));
+    dispatch(data.uploading(NODE_USER));
+    db.root.update(updates).then( () => {
+      dispatch(data.uploaded(NODE_TODOS));
+      dispatch(data.uploaded(NODE_USER));
+    });
 }
 
 function _validateMessage(uid, msg) {

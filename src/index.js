@@ -51,8 +51,8 @@ auth.onAuthStateChanged( usr => {
           
           store.dispatch(action.user.signOut()).then(() => {
             console.log ('\n# Logged out');   
-            console.log ('\n# Re-Login as Duong... -----------------------------------------');
-            store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456')).catch(err => console.log (err));
+            // console.log ('\n# Re-Login as Duong... -----------------------------------------');
+            // store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456')).catch(err => console.log (err));
           });
         }
 
@@ -60,15 +60,25 @@ auth.onAuthStateChanged( usr => {
         if (usr.uid === Users.duong) {
           
           // accept todo   
-          const msgId = '-KWp6VLGUnQXGBdjV2MN';                 
-          const msg = store.getState().user.messages[msgId];  
-          // const msg = false;        
-          if (msg) {
-            console.log('\n#Accept invited todo');
-            store.dispatch(action.todos.accept(msg));
+          // const msgId = '-KWwnlxieCC7mzBcxil0';                 
+          // const msg = store.getState().user.messages[msgId];  
+          // // const msg = false;        
+          // if (msg) {
+          //   // console.log('\n#Accept invited todo');
+          //   // store.dispatch(action.todos.accept(msg));
+          //   console.log('\n#Decline invited todo');
+          //   store.dispatch(action.todos.decline(msg));
+          //   displayStore();
+          // } else {
+          //   console.log ('\n#No message found');         
+          // }
+
+          const todoId = '-KWp6VL6WFN03GeYTKna';
+          const todo = store.getState().todos[todoId];
+          if (todo) {
+            // complete a todo
+            store.dispatch(action.todos.complete(todo));
             displayStore();
-          } else {
-            console.log ('\n#No message found');         
           }
 
           // console.log ('\n# Adding new todo ------------------------------'); 
