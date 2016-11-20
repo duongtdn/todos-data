@@ -40,12 +40,16 @@ auth.onAuthStateChanged( usr => {
         if (usr.uid === Users.mai) {
 
           console.log ('\n# Adding new todo ------------------------------');
-          const todoId = store.dispatch(action.todos.add('Implement message system'));
-          console.log ('\n# Share new added todo ------------------------------');
-          store.dispatch(action.todos.share({
-            users : [Users.duong],
-            id : todoId
+          const todoId = store.dispatch(action.todos.add({
+            text : 'Finishing todo completion function',
+            urgent : true,
+            share : [Users.duong]
           }));
+          // console.log ('\n# Share new added todo ------------------------------');
+          // store.dispatch(action.todos.share({
+          //   users : [Users.duong],
+          //   id : todoId
+          // }));
           
           displayStore();
           
@@ -59,21 +63,21 @@ auth.onAuthStateChanged( usr => {
         // duong
         if (usr.uid === Users.duong) {
           
-          // accept todo   
-          // const msgId = '-KWwnlxieCC7mzBcxil0';                 
+          // // accept todo   
+          // const msgId = '-KX0kbzg15PiIMEFiGdf';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {
-          //   // console.log('\n#Accept invited todo');
-          //   // store.dispatch(action.todos.accept(msg));
-          //   console.log('\n#Decline invited todo');
-          //   store.dispatch(action.todos.decline(msg));
+          //   console.log('\n#Accept invited todo');
+          //   store.dispatch(action.todos.accept(msg));
+          //   // console.log('\n#Decline invited todo');
+          //   // store.dispatch(action.todos.decline(msg));
           //   displayStore();
           // } else {
           //   console.log ('\n#No message found');         
           // }
 
-          const todoId = '-KWp6VL6WFN03GeYTKna';
+          const todoId = '-KX0kbzbqcpkY8adqnGS';
           const todo = store.getState().todos[todoId];
           if (todo) {
             // complete a todo

@@ -1,7 +1,7 @@
 "use strict"
 
 export const STATUS = {
-  ACTIVE    : 'active',
+  PENDING   : 'pending',
   COMPLETED : 'completed',
   CANCELLED : 'cancelled',
   UNREAD    : 'unread'

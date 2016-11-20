@@ -64,23 +64,47 @@ export const todos = {
       };
   },
 
-  add(text, users) {
+  add({text = '', share = {}, urgent = false, highlight = false}) {
 
     return dispatch => {
       if (auth.currentUser) {
-        /* add todo to todos db */
-        if (!users) { users = {}; }
-        users[auth.currentUser.uid] = OWNER;
+        const uid = auth.currentUser.uid;
+        const updates = {};
+        const todoId = db.todos.push().key;
+        const stakeholders = {};
+        
+        // prepare invitation messages
+        if (share.length > 0) {
+          const message = messages.template(TEMPLATE.INVITE_TODO).create({
+            receivers : share,
+            content   : todoId
+          });
+          share.forEach(user => {
+            const msgKey = db.users.child(user).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${user}/msg/${msgKey}`] = message;
+            stakeholders[user] = 'invited';
+          });
+        }
+        // prepare todo
+        stakeholders[uid] = OWNER;
         const timestamp = getTime();
-        const todoRef = db.todos.add({
-          text       : text,
-          share      : users,
-          createdAt  : timestamp,
-          status     : STATUS.ACTIVE
-        });  
-        /* update todo id in user data */
-        db.users.addTodo(todoRef.key, {status : STATUS.ACTIVE, role : OWNER});
-        return todoRef.key;
+        updates[`todos/${todoId}`] = {
+          id          : todoId,
+          text        : text,
+          share       : stakeholders,
+          createdAt   : timestamp,
+          status      : STATUS.PENDING,
+          completedBy : '',
+          completedAt : '',
+          urgent      : urgent,
+          highlight   : highlight
+        }
+        // prepare todo in user list
+        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.PENDING, role : OWNER};
+        // update
+         _updateTodoAndUser (dispatch, updates);
+        return todoId;
       } else {
         dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
         return null;
@@ -102,17 +126,26 @@ export const todos = {
 
   complete(todo) {
     return dispatch => {
+      console.log('completing a todo');
+      console.log(todo);
       const uid = auth.currentUser.uid;
+      if (!uid) {
+        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        return null;
+      }
+
       const updates = {};
       const stakeholders = [];
       for (let user in todo.share) {
-        if (todo.share[user] === COLLABORATOR) {
+        if (user !== uid) {
           stakeholders.push(user);
         }
       }
-      // change status of todo as complete, then broadcast a message 
+      // change status of todo as completed, then broadcast a message 
       // to all stakeholders if any
       updates[`todos/${todo.id}/status`] = STATUS.COMPLETED;
+      updates[`todos/${todo.id}/completedBy`] = uid;
+      updates[`todos/${todo.id}/completedAt`] = getTime();
       if (stakeholders.length > 0) {
         const message = messages.template(TEMPLATE.COMPLETE_TODO).create({
           receivers : stakeholders,
@@ -122,9 +155,13 @@ export const todos = {
           const msgKey = db.users.child(user).child('msg').push().key;
           message.id = msgKey;
           updates[`users/${user}/msg/${msgKey}`] = message;
+          updates[`users/${user}/todos/${todo.id}/status`] = STATUS.COMPLETED;
         });
       }
+      updates[`users/${uid}/todos/${todo.id}/status`] = STATUS.COMPLETED;
       // update
+      console.log('updating to server');
+      console.log(updates);
       _updateTodoAndUser (dispatch, updates);
     }
   },
@@ -149,7 +186,7 @@ export const todos = {
       });
 
       // update
-      _updateTodoAndUser (dispatch, updates);
+     _updateTodoAndUser (dispatch, updates);
     }
     
   },
@@ -162,8 +199,8 @@ export const todos = {
       const updates = {};
       if (todoId) {
         // update role in todo, add todo in user todo list, remove message
-        updates[`todos/${todoId}/share/${uid}`] = 'collaborator';
-        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.ACTIVE, role : COLLABORATOR};
+        updates[`todos/${todoId}/share/${uid}`] = COLLABORATOR;
+        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.PENDING, role : COLLABORATOR};
         updates[`users/${uid}/msg/${message.id}`] = null;
         // update
         _updateTodoAndUser (dispatch, updates);

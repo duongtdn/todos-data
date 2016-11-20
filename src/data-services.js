@@ -12,12 +12,6 @@ db.users = db.ref('users');
 
 db.todos.lists = {};
 
-db.todos.add = content => {
-  const ref = db.todos.push();
-  content['id'] = ref.key;
-  ref.set(content);
-  return ref;
-}
 
 db.todos.get = (list, callback) => {
   const todosList = {};
@@ -57,15 +51,6 @@ db.todos.get = (list, callback) => {
 
 /* extend utilities for db.users */
 
-db.users.addTodo = (todoId, content) => {
-   const user = fb.auth().currentUser;
-    if (user) {
-      const ref = db.users.child(user.uid).child('todos').child(todoId).set(content);
-      return ref;
-    } else {
-      return null;
-    }
-}
 
 db.users.getData = callback => {
   const user = fb.auth().currentUser;
