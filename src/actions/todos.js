@@ -114,10 +114,36 @@ export const todos = {
 
   },
 
-  delete(id) {
+  delete(todo) {
     return dispatch => {
       if (auth.currentUser) {
-        /* to be implemented after message system work */
+        
+        const uid = auth.currentUser.uid;
+        const updates = {};
+        const stakeholders = [];
+        // delete todo in todos at root and users, then broadcast a mesage to 
+        // all stakeholders
+        for (let user in todo.share) {
+          if (user !== uid) {
+            stakeholders.push(user);
+          }
+        }
+        updates[`todos/${todo.id}`] = null; // delete todo or change status to deleted???
+        if (stakeholders.length > 0) {
+          const message = messages.template(TEMPLATE.DELETE_TODO).create({
+            receivers : stakeholders,
+            content   : todo.text
+          });
+          stakeholders.forEach(user => {
+            const msgKey = db.users.child(user).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${user}/msg/${msgKey}`] = message;
+            updates[`users/${user}/todos/${todo.id}`] = null;
+          });
+        }
+        updates[`users/${uid}/todos/${todo.id}`] = null;
+        // update
+        _updateTodoAndUser (dispatch, updates);
       } else {
         dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
       }
@@ -126,8 +152,6 @@ export const todos = {
 
   complete(todo) {
     return dispatch => {
-      console.log('completing a todo');
-      console.log(todo);
       const uid = auth.currentUser.uid;
       if (!uid) {
         dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
@@ -160,8 +184,6 @@ export const todos = {
       }
       updates[`users/${uid}/todos/${todo.id}/status`] = STATUS.COMPLETED;
       // update
-      console.log('updating to server');
-      console.log(updates);
       _updateTodoAndUser (dispatch, updates);
     }
   },

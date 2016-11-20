@@ -38,7 +38,7 @@ auth.onAuthStateChanged( usr => {
         
         // mai
         if (usr.uid === Users.mai) {
-
+          console.log('Logged as Mai');
           console.log ('\n# Adding new todo ------------------------------');
           const todoId = store.dispatch(action.todos.add({
             text : 'Finishing todo completion function',
@@ -50,7 +50,7 @@ auth.onAuthStateChanged( usr => {
           //   users : [Users.duong],
           //   id : todoId
           // }));
-          
+
           displayStore();
           
           store.dispatch(action.user.signOut()).then(() => {
@@ -62,9 +62,14 @@ auth.onAuthStateChanged( usr => {
 
         // duong
         if (usr.uid === Users.duong) {
-          
+          console.log('Logged as Duong');
+
+
+          const todoId = '-KX2qGjcVMAL41QgGPbG';
+          const todo = store.getState().todos[todoId];
+
           // // accept todo   
-          // const msgId = '-KX0kbzg15PiIMEFiGdf';                 
+          // const msgId = '-KX2qGjcVMAL41QgGPbH';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {
@@ -77,16 +82,29 @@ auth.onAuthStateChanged( usr => {
           //   console.log ('\n#No message found');         
           // }
 
-          const todoId = '-KX0kbzbqcpkY8adqnGS';
-          const todo = store.getState().todos[todoId];
+          // // complete a todo
+          // // const todo = {
+          // //   id : '-KX2kmS-UuByIMOKuA5G',
+          // //   share : {
+          // //     MrrsU8OMAFMre1bOdLgWTZdBqD62: 'owner',
+          // //     VgLf702x7bXZeus6Rwvohre208e2: 'invited'
+          // //   }
+          // // };
+          // if (todo) {
+          //   // complete a todo
+          //   store.dispatch(action.todos.complete(todo));
+          //   displayStore();
+          // }
+
+          // delete a todo
           if (todo) {
             // complete a todo
-            store.dispatch(action.todos.complete(todo));
+            store.dispatch(action.todos.delete(todo));
             displayStore();
           }
 
           // console.log ('\n# Adding new todo ------------------------------'); 
-          // const todoId = store.dispatch(action.todos.add('Check with security system')); 
+          // const todoId = store.dispatch(action.todos.add(' with security system')); 
 
           // this action should Failed
           // db.ref(`todos/-KWoP_T9TjNrH9G-asqS/share/${usr.uid}`).set('collaborator');
@@ -104,12 +122,14 @@ console.log ('\n# Initial State ---------------------------------------------');
 console.log (store.getState());
 
 function displayStore() {
-  console.log ('Todos :');
+  console.log('\n# Store ---------------------------------');
+  console.log ('# - Todos :');
   console.log (store.getState().todos);
-  console.log('User.messages');
+  console.log('# - User.messages');
   console.log (store.getState().user.messages);
-  console.log('User.todos');
+  console.log('# - User.todos');
   console.log (store.getState().user.todos);
+  console.log('#----------------------------------------');
 }
 
 console.log ('\n# Login... --------------------------------------------------');

@@ -8,7 +8,9 @@ import { ERROR } from './constants'
 import { STATUS, TYPE, SUBJECT, COLLABORATOR } from './constants'; 
 
 export const TEMPLATE = {
-  INVITE_TODO : 'inviteTodo'
+  INVITE_TODO   : 'inviteTodo',
+  COMPLETE_TODO : 'completeTodo',
+  DELETE_TODO   : 'deleteTodo'
 };
 
 export const MESSAGES = {
@@ -19,9 +21,10 @@ export const MESSAGES = {
     NOTIFICATION  : 'notification'
   },
   SUBJECT: {
-    SHARE_TODO    : 'todo.share',
-    TODO_CHANGED  : 'todo.changed',
-    TOD_COMPLETED : 'todo.completed'
+    SHARE_TODO      : 'todo.share',
+    TODO_CHANGED    : 'todo.changed',
+    TODO_COMPLETED  : 'todo.completed',
+    TODO_DELETED    : 'todo.deleted'
   }
 };
 
@@ -51,7 +54,14 @@ export default {
       case TEMPLATE.COMPLETE_TODO :
 
         this.msgStruct.type = MESSAGES.TYPE.NOTIFICATION;
-        this.msgStruct.subject = MESSAGES.SUBJECT.TOD_COMPLETED;
+        this.msgStruct.subject = MESSAGES.SUBJECT.TODO_COMPLETED;
+
+        return this;
+
+       case TEMPLATE.DELETE_TODO :
+
+        this.msgStruct.type = MESSAGES.TYPE.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.TODO_DELETED;
 
         return this;
 
