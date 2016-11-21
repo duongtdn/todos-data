@@ -51,6 +51,17 @@ export const user = {
         payload : { messages }
       };
     },
+    /* asynchronous actions */
+    delete (id) {
+      return dispatch => {
+        const uid = auth.currentUser.uid;
+        if (!uid) {
+          dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+          return null;
+        }
+        db.users.child(uid).child('msg').child(id).set(null);
+      }
+    }
 
   },
 
