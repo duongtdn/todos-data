@@ -21,6 +21,7 @@ export const TODOS = {
   SHARE     : 'todos.share',
   ACCEPT    : 'todos.accept',
   DECLINE   : 'todos.decline',
+  EDIT      : 'todos.edit'
 }
 
 /* action creators */
@@ -241,17 +242,64 @@ export const todos = {
         updates[`todos/${todoId}/share/${uid}`] = null;
         updates[`users/${uid}/msg/${message.id}`] = null;
         // update
-        dispatch(data.uploading(NODE_TODOS));
-        dispatch(data.uploading(NODE_USER));
-        db.root.update(updates).then( () => {
-          dispatch(data.uploaded(NODE_TODOS));
-          dispatch(data.uploaded(NODE_USER));
-        });
+        _updateTodoAndUser (dispatch, updates);
       }
     }
   },
 
-  
+  edit( todo, {text = null, highlight = null, urgent = null}) {
+    return dispatch => {
+
+      const uid = auth.currentUser.uid;
+      if (!uid) {
+        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        return null;
+      }
+
+      if (todo.id === null) {
+        return null;
+      }
+
+      const updates = {};
+      const stakeholders = [];
+      for (let user in todo.share) {
+        if (user !== uid) {
+          stakeholders.push(user);
+        }
+      }
+
+      if (text !== null) {
+        updates[`todos/${todo.id}/text`] = text;
+      }
+
+      if (highlight !== null) {
+        updates[`todos/${todo.id}/highlight`] = highlight;
+      }
+
+      if (urgent !== null) {
+        updates[`todos/${todo.id}/urgent`] = urgent;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        // send message to stakeholders to notify change
+        if (stakeholders.length > 0) {
+          const message = messages.template(TEMPLATE.CHANGE_TODO).create({
+            receivers : stakeholders,
+            content   : todo.text
+          });
+          stakeholders.forEach(user => {
+            const msgKey = db.users.child(user).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${user}/msg/${msgKey}`] = message;
+          });
+        }
+      }
+
+      // update
+      _updateTodoAndUser (dispatch, updates);
+
+    }
+  }
 
 }
 

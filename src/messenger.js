@@ -10,7 +10,8 @@ import { STATUS, TYPE, SUBJECT, COLLABORATOR } from './constants';
 export const TEMPLATE = {
   INVITE_TODO   : 'inviteTodo',
   COMPLETE_TODO : 'completeTodo',
-  DELETE_TODO   : 'deleteTodo'
+  DELETE_TODO   : 'deleteTodo',
+  CHANGE_TODO   : 'changeTodo'
 };
 
 export const MESSAGES = {
@@ -64,6 +65,14 @@ export default {
         this.msgStruct.subject = MESSAGES.SUBJECT.TODO_DELETED;
 
         return this;
+
+      case TEMPLATE.CHANGE_TODO :
+
+        this.msgStruct.type = MESSAGES.TYPE.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.TODO_CHANGED;
+
+        return this;
+
 
       default :
         return this;

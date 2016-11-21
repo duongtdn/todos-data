@@ -65,11 +65,11 @@ auth.onAuthStateChanged( usr => {
           console.log('Logged as Duong');
 
 
-          const todoId = '-KX2qGjcVMAL41QgGPbG';
+          const todoId = '-KX3TRuyM8gEF2hkxfJQ';
           const todo = store.getState().todos[todoId];
 
           // // accept todo   
-          // const msgId = '-KX2qGjcVMAL41QgGPbH';                 
+          // const msgId = '-KX3TRuyM8gEF2hkxfJR';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {
@@ -97,10 +97,19 @@ auth.onAuthStateChanged( usr => {
           // }
 
           // delete a todo
+          // if (todo) {
+          //   // complete a todo
+          //   store.dispatch(action.todos.delete(todo));
+          //   displayStore();
+          // }
+
+          // edit a todo
           if (todo) {
-            // complete a todo
-            store.dispatch(action.todos.delete(todo));
-            displayStore();
+            store.dispatch(action.todos.edit(todo, {
+              text : 'todo edit function',
+              highlight : true,
+              urgent : true
+            }));
           }
 
           // console.log ('\n# Adding new todo ------------------------------'); 
