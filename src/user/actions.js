@@ -84,6 +84,18 @@ export const user = {
           _updateUserNode(dispatch,updates);
         }
       }
+    },
+    remove(id) {
+      return dispatch => {
+        const uid = auth.currentUser.uid;
+        const updates = {};
+        if (!uid) {
+          dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
+          return null;
+        }
+        updates[`users/${uid}/friends/${id}`] = null;
+        _updateUserNode(dispatch,updates);
+      }
     }
   },
 
