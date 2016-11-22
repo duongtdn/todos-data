@@ -127,6 +127,9 @@ auth.onAuthStateChanged( usr => {
           // this action should Failed
           // db.ref(`todos/-KWoP_T9TjNrH9G-asqS/share/${usr.uid}`).set('collaborator');
 
+          //search for user
+          db.usersList.orderByChild('email').equalTo('mainth@stormgle.com').on('child_added', snap => console.log(snap.val()));
+          db.usersList.orderByChild('name').equalTo('Admin Stormgle').on('child_added', snap => console.log(snap.val()));
         }
       });
     });
@@ -157,7 +160,7 @@ console.log ('\n# Login... --------------------------------------------------');
 // store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
 // .then( usr => console.log(usr) )
 // .catch(err => console.log(err) );
-// store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
+store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
 
 // store.dispatch(action.user.signUp('admin@stormgle.com','123456','Admin Stormgle'));
 
