@@ -1,11 +1,8 @@
 "use strict"
 
 import { getTime } from './util'
-import auth from './auth-services';
-import db from './data-services';
-import { ERROR } from './constants'
-
-import { STATUS, TYPE, SUBJECT, COLLABORATOR } from './constants'; 
+import auth from './auth-services'
+import db from './data-services'
 
 export const TEMPLATE = {
   INVITE_TODO   : 'inviteTodo',
@@ -103,36 +100,6 @@ export default {
     return this.msgStruct;
   },
 
-  
-  acceptTodo (msgId, msg = null) {
-    const user = auth.currentUser;
-    // check permission, message type and subject
-    checkPermission(user, msg);
-
-    const todoId = msg.content; 
-    if (todoId) {
-      // update role in todo and add todo into user todos list
-      db.todos.child(todoId).child('users').child(user.uid).set(COLLABORATOR);
-      db.users.addTodo(todoId, {status : STATUS.ACTIVE, role : COLLABORATOR});
-      // delete message
-      db.users.child(user.uid).child('msg').child(msgId).set(null);
-    }
-  
-  },  
-
-  declineTodo(msgId, msg = null) {
-    const user = auth.currentUser;
-    // check permission, message type and subject
-    checkPermission(user, msg);
-
-    const todoId = msg.content; 
-    if (todoId) {
-      // remove user in todo 
-      db.todos.child(todoId).child('users').child(user.uid).set(null);
-      // delete message
-      db.users.child(user.uid).child('msg').child(msgId).set(null);
-    }
-  },
 
   _clear() {
     this.msgStruct = {
@@ -147,23 +114,4 @@ export default {
     return this;
   },
 
-}
-
-function checkPermission(user, msg) {
-  if (msg === null || msg === undefined) {
-    throw ERROR.INVALID;
-  }
-  if (!msg.to || msg.to !== user.uid) {
-    throw ERROR.PERMISSION_DENINED;
-  }    
-  if (!msg.type || msg.type !== TYPE.NOTIFICATION) {
-    throw ERROR.INVALID;
-  }
-  if (!msg.subject || msg.subject !== SUBJECT.SHARE_TODO) {
-    throw ERROR.INVALID;
-  } 
-  if (!msg.content) {
-    throw ERROR.INVALID;
-  }
-  return true;
 }

@@ -6,7 +6,7 @@ import thunkMiddleware from 'redux-thunk';
 import auth from './auth-services';
 import rootReducer from './reducers';
 import * as action from './actions';
-import messages, { TEMPLATE } from './messenger';
+import messages, { TEMPLATE } from './messages';
 
 import db from './data-services';
 
@@ -69,11 +69,11 @@ auth.onAuthStateChanged( usr => {
           console.log('Logged as Duong');
 
 
-          const todoId = '-KX3TRuyM8gEF2hkxfJQ';
+          const todoId = '-KX8pEtoEjTUaocwjXrq';
           const todo = store.getState().todos[todoId];
 
           // // accept todo   
-          // const msgId = '-KX3TRuyM8gEF2hkxfJR';                 
+          // const msgId = '-KX8pEtpJIwAI86xZpTl';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {
@@ -101,20 +101,20 @@ auth.onAuthStateChanged( usr => {
           // }
 
           // delete a todo
-          // if (todo) {
-          //   // complete a todo
-          //   store.dispatch(action.todos.delete(todo));
-          //   displayStore();
-          // }
-
-          // edit a todo
           if (todo) {
-            store.dispatch(action.todos.edit(todo, {
-              text : 'todo edit function',
-              highlight : true,
-              urgent : true
-            }));
+            // complete a todo
+            store.dispatch(action.todos.delete(todo));
+            displayStore();
           }
+
+          // // edit a todo
+          // if (todo) {
+          //   store.dispatch(action.todos.edit(todo, {
+          //     text : 'todo edit function',
+          //     highlight : true,
+          //     urgent : true
+          //   }));
+          // }
 
           // console.log ('\n# Adding new todo ------------------------------'); 
           // const todoId = store.dispatch(action.todos.add(' with security system')); 
@@ -147,10 +147,10 @@ function displayStore() {
 
 console.log ('\n# Login... --------------------------------------------------');
 
-store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
+// store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
 // .then( usr => console.log(usr) )
 // .catch(err => console.log(err) );
-// store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
+store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
 
 
 // // Stop listening to state updates

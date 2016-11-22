@@ -1,13 +1,7 @@
 "use strict"
 
-import { TODOS } from '../actions';
-import { STATUS } from '../constants';
+import { TODOS, STATUS } from './constants'
 
-let key = 1;
-
-function autokey() {
-  return key++;
-} 
 
 export function todos (state = {}, action) {
   

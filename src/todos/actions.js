@@ -1,28 +1,14 @@
 "use strict"
 
-import { STATUS, ERROR, OWNER, COLLABORATOR, NODE_TODOS, NODE_USER } from '../constants'
 import { getTime } from '../util'
 import db from '../data-services'
 import auth from '../auth-services'
-import { data } from './data'
-import { error } from './error'
-import messages, {TEMPLATE, MESSAGES} from '../messenger';
-
-
-/* action types */
-export const TODOS = {
-  /* synchronous actions */
-  UPDATE    : 'todos.update',
-  /* asynchronous actions */
-  FETCH     : 'todos.fetch',
-  ADD       : 'todos.add',
-  DELETE    : 'todos.delete',
-  COMPLETE  : 'todos.complete',
-  SHARE     : 'todos.share',
-  ACCEPT    : 'todos.accept',
-  DECLINE   : 'todos.decline',
-  EDIT      : 'todos.edit'
-}
+import { data } from '../data/actions'
+import { DNODE } from '../data/constants'
+import { error } from '../error/actions'
+import { ECODE } from '../error/constants'
+import messages, {TEMPLATE, MESSAGES} from '../messages'
+import { TODOS, STATUS, OWNER, COLLABORATOR } from './constants'
 
 /* action creators */
 
@@ -47,7 +33,7 @@ export const todos = {
         
         // First dispatch: the app state is updated to inform
         // that the API call is starting.
-        dispatch(data.request(NODE_TODOS));
+        dispatch(data.request(DNODE.TODOS));
         
         // The function called by the thunk middleware can return a value,
         // that is passed on as the return value of the dispatch method.
@@ -55,7 +41,7 @@ export const todos = {
           db.users.getTodosList( list => {
             db.todos.get(list, todosList => {
               dispatch(todos.update(todosList));
-              dispatch(data.received(NODE_TODOS));
+              dispatch(data.received(DNODE.TODOS));
               resolve(todosList);
             });
           });
@@ -107,7 +93,7 @@ export const todos = {
          _updateTodoAndUser (dispatch, updates);
         return todoId;
       } else {
-        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
         return null;
       }
       
@@ -146,7 +132,7 @@ export const todos = {
         // update
         _updateTodoAndUser (dispatch, updates);
       } else {
-        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
       }
     }
   },
@@ -155,7 +141,7 @@ export const todos = {
     return dispatch => {
       const uid = auth.currentUser.uid;
       if (!uid) {
-        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
         return null;
       }
 
@@ -252,7 +238,7 @@ export const todos = {
 
       const uid = auth.currentUser.uid;
       if (!uid) {
-        dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+        dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
         return null;
       }
 
@@ -304,18 +290,18 @@ export const todos = {
 }
 
 function _updateTodoAndUser (dispatch, updates) {
-    dispatch(data.uploading(NODE_TODOS));
-    dispatch(data.uploading(NODE_USER));
+    dispatch(data.uploading(DNODE.TODOS));
+    dispatch(data.uploading(DNODE.USER));
     db.root.update(updates).then( () => {
-      dispatch(data.uploaded(NODE_TODOS));
-      dispatch(data.uploaded(NODE_USER));
+      dispatch(data.uploaded(DNODE.TODOS));
+      dispatch(data.uploaded(DNODE.USER));
     });
 }
 
 function _validateMessage(uid, msg) {
   
   if (msg === null || msg === undefined) {
-    throw ERROR.INVALID;
+    throw ECODE.INVALID;
   }
 
   let checkUID = false;
@@ -326,19 +312,19 @@ function _validateMessage(uid, msg) {
     }
   });
   if (!checkUID) {
-    throw ERROR.PERMISSION_DENINED;
+    throw ECODE.PERMISSION_DENINED;
   }
 
   if (!msg.type || msg.type !== MESSAGES.TYPE.NOTIFICATION) {
-    throw ERROR.INVALID;
+    throw ECODE.INVALID;
   }
 
   if (!msg.subject || msg.subject !== MESSAGES.SUBJECT.SHARE_TODO) {
-    throw ERROR.INVALID;
+    throw ECODE.INVALID;
   }
 
   if (!msg.content) {
-    throw ERROR.INVALID;
+    throw ECODE.INVALID;
   }
 
   return true;

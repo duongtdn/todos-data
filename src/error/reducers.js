@@ -1,6 +1,6 @@
 "use strict"
 
-import { ERROR } from '../actions'
+import { ERROR } from './constants'
 
 export function error (state = {}, action) {
   

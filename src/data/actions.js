@@ -1,12 +1,6 @@
 "use strict"
 
-/* action types */
-export const DATA = {
-  REQUEST     : 'data.request',
-  RECEIVED    : 'data.receive',
-  UPLOADING   : 'data.uploading',
-  UPLOADED    : 'data.uploaded',
-}
+import { DATA } from './constants';
 
 /* action creators */
 export const data = {

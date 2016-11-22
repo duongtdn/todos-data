@@ -1,34 +1,12 @@
 "use strict"
 
-import auth from '../auth-services';
-import db from '../data-services';
-import { data } from './data';
-import { error } from './error';
-import { STATUS, ERROR, NODE_USER } from '../constants'; 
-
-
-/* action types */
-export const USER = {
-
-  AUTH          : {
-    /* synchronous actions */
-    UPDATE      : 'user.auth.update'
-  },
-  MESSAGES     : {
-    /* synchronous actions */
-    UPDATE      : 'user.messages.update'
-  },
-  TODOS         : {
-    /* synchronous actions */
-    UPDATE      : 'user.todos.update'
-  },
-  
-  /* asynchronous actions */
-  SIGNIN        : 'user.signin',
-  SIGNOUT       : 'user.signout',
-  LOAD          : 'user.load',
-  UPDATE        : 'user.update',
-}
+import auth from '../auth-services'
+import db from '../data-services'
+import { data } from '../data/actions'
+import { DNODE } from '../data/constants'
+import { error } from '../error/actions'
+import { ECODE } from '../error/constants'
+import { USER } from './constants'
 
 /* action creators */
 export const user = {
@@ -56,7 +34,7 @@ export const user = {
       return dispatch => {
         const uid = auth.currentUser.uid;
         if (!uid) {
-          dispatch(error.update(ERROR.NOT_AUTHEN, {message : 'user is not signed in'}));
+          dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
           return null;
         }
         db.users.child(uid).child('msg').child(id).set(null);
@@ -85,13 +63,13 @@ export const user = {
         return auth.signInWithEmailAndPassword(email, password)
           .then( user => {
             // successful signed in, clear error flag if any 
-            dispatch(error.clear(ERROR.SIGNIN));
-            dispatch(error.clear(ERROR.NOT_AUTHEN)); 
+            dispatch(error.clear(ECODE.SIGNIN));
+            dispatch(error.clear(ECODE.NOT_AUTHEN)); 
             resolve(user); 
           })
           .catch( err => {
             // sign in error
-            dispatch(error.update(ERROR.SIGNIN, err));
+            dispatch(error.update(ECODE.SIGNIN, err));
             reject(err);
           });
       });
@@ -104,18 +82,18 @@ export const user = {
       return auth.signOut()
         .then( () => {
           // successful signed out, clear error flag if any 
-          dispatch(error.clear(ERROR.SIGNOUT));
+          dispatch(error.clear(ECODE.SIGNOUT));
         })
         .catch( err => {
           // sign out error
-          dispatch(error.update(ERROR.SIGNOUT, err));
+          dispatch(error.update(ECODE.SIGNOUT, err));
         })
     }
   },
 
   load() {
     return dispatch => {
-      dispatch(data.request(NODE_USER));
+      dispatch(data.request(DNODE.USER));
       return new Promise((resolve, reject) => {
         // reactive update if user data change
         db.users.getData(userPrivateData => {
@@ -123,7 +101,7 @@ export const user = {
           const msg    = (userPrivateData) ? userPrivateData.msg || null : null;
           const todos  = (userPrivateData) ? userPrivateData.todos || null : null;
           dispatch(this.update(usr, msg, todos));
-          dispatch(data.received(NODE_USER));
+          dispatch(data.received(DNODE.USER));
           resolve(user);
         });
       });       

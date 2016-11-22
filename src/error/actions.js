@@ -1,11 +1,6 @@
 "use strict"
 
-/* action types */
-export const ERROR = {
-  /* synchronous actions */
-  UPDATE        : 'error.update',
-  CLEAR         : 'error.clear'
-}
+import { ERROR } from './constants'
 
 /* action creators */
 export const error = {

@@ -1,7 +1,7 @@
 "user strict"
 
 import { combineReducers } from 'redux'
-import { USER } from '../actions'
+import { USER } from './constants'
 
 
 function auth (state = {}, action) {

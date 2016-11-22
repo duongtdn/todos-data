@@ -1,6 +1,6 @@
 "use strict"
 
-import { DATA } from '../actions';
+import { DATA } from './constants';
 
 export function data (state = {}, action) {
   
