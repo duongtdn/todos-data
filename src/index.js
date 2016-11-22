@@ -29,6 +29,7 @@ auth.onAuthStateChanged( usr => {
     console.log ('\n# User is logged ----------------------------------------');
     // store.dispatch(action.user.friends.add([{id : Users.mai, name : 'Mai Nguyen', relationship : 'wife'}]));
     // store.dispatch(action.user.friends.remove(Users.mai));
+    // store.dispatch(action.user.friends.edit(Users.mai, {name : 'Mai Nguyen', relationship : 'spouse'}));
     store.dispatch(action.user.load()).then( user => {
      
       console.log ('\n# Fetching... ---------------------------------------');
