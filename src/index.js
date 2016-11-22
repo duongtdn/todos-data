@@ -159,7 +159,7 @@ console.log ('\n# Login... --------------------------------------------------');
 // .catch(err => console.log(err) );
 // store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
 
-// store.dispatch(action.user.signUp('admin@stormgle.com','123456'));
+// store.dispatch(action.user.signUp('admin@stormgle.com','123456','Admin Stormgle'));
 
 // // Stop listening to state updates
 // // unsubscribe();

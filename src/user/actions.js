@@ -119,13 +119,14 @@ export const user = {
 
   /* asynchronous actions */
 
-  signUp(email, password) {
+  signUp(email, password, name) {
     return dispatch => {
       return new Promise((resolve, reject) => {
         return auth.createUserWithEmailAndPassword(email, password)
           .then( user => {
             console.log(user);
-            db.root.child('usersList').child(user.uid).set({ email });
+            if (!name) { name = email; }
+            db.root.child('usersList').child(user.uid).set({ email, name });
             // successful signed up, clear error flag if any 
             dispatch(error.clear(ECODE.SIGNIN));
             dispatch(error.clear(ECODE.NOT_AUTHEN)); 
