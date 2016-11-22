@@ -8,8 +8,7 @@ export function filter (state = {}, action) {
   switch (action.type) {
 
     case FILTER.APPLY :
-      newState.hideCompletion = action.payload.condition.hideCompletion;
-      return newState;
+      return action.payload;
 
     default :
       return state;

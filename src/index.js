@@ -69,11 +69,11 @@ auth.onAuthStateChanged( usr => {
           console.log('Logged as Duong');
 
 
-          const todoId = '-KX8pEtoEjTUaocwjXrq';
+          const todoId = '-KX8v6BCdh0sSLRoHPnU';
           const todo = store.getState().todos[todoId];
 
           // // accept todo   
-          // const msgId = '-KX8pEtpJIwAI86xZpTl';                 
+          // const msgId = '-KX8vWruZDgACJPGs5h9';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {
@@ -100,12 +100,12 @@ auth.onAuthStateChanged( usr => {
           //   displayStore();
           // }
 
-          // delete a todo
-          if (todo) {
-            // complete a todo
-            store.dispatch(action.todos.delete(todo));
-            displayStore();
-          }
+          // // delete a todo
+          // if (todo) {
+          //   // complete a todo
+          //   store.dispatch(action.todos.delete(todo));
+          //   displayStore();
+          // }
 
           // // edit a todo
           // if (todo) {
@@ -127,7 +127,7 @@ auth.onAuthStateChanged( usr => {
     });
   } else {
     console.log ('\n# User is not logged ------------------------------------');
-    store.dispatch(action.user.update(null,null,null)); 
+    store.dispatch(action.user.update(null,null,null,null)); 
   }    
 });
 
@@ -142,6 +142,8 @@ function displayStore() {
   console.log (store.getState().user.messages);
   console.log('# - User.todos');
   console.log (store.getState().user.todos);
+  console.log('# - User.friends');
+  console.log (store.getState().user.friends);
   console.log('#----------------------------------------');
 }
 
@@ -150,11 +152,11 @@ console.log ('\n# Login... --------------------------------------------------');
 // store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
 // .then( usr => console.log(usr) )
 // .catch(err => console.log(err) );
-// store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
+store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
 
 
 // // Stop listening to state updates
 // // unsubscribe();
 
-store.dispatch(action.filter.apply({hideCompletion : true}));
-console.log (store.getState());
+// store.dispatch(action.filter.apply({hideCompletion : true}));
+// console.log (store.getState());

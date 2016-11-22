@@ -4,10 +4,10 @@ import { FILTER } from './constants'
 
 /* action creater */
 export const filter = {
-  apply(condition) {
+  apply({hideCompletion = false}) {
     return {
       type    : FILTER.APPLY,
-      payload : { condition }
+      payload : { hideCompletion }
     }
   }
 }

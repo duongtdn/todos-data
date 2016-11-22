@@ -30,6 +30,18 @@ function messages (state = {}, action) {
   }
 }
 
+function friends (state = {}, action) {
+  switch (action.type) {
+
+    case USER.FRIENDS.UPDATE :
+      return action.payload.friends;
+
+    default :
+      return state;
+
+  }  
+}
+
 function todos (state = {}, action) {
 
   switch (action.type) {
@@ -46,5 +58,6 @@ function todos (state = {}, action) {
 export const user = combineReducers({
   auth,
   messages,
-  todos
+  friends,
+  todos,
 });

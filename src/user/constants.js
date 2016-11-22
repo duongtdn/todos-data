@@ -15,6 +15,9 @@ export const USER = {
     /* synchronous actions */
     UPDATE      : 'user.todos.update'
   },
+  FRIENDS       : {
+    UPDATE      : 'user.friends.update'
+  },
   
   /* asynchronous actions */
   SIGNIN        : 'user.signin',

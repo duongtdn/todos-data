@@ -63,6 +63,15 @@ export const user = {
     }, 
   },
 
+  friends : {
+    update (friends) {
+      return {
+        type    : USER.FRIENDS.UPDATE,
+        payload : { friends }
+      }
+    }
+  },
+
 
   /* asynchronous actions */
 
@@ -110,7 +119,8 @@ export const user = {
           const usr   = auth.currentUser;
           const msg    = (userPrivateData) ? userPrivateData.msg || null : null;
           const todos  = (userPrivateData) ? userPrivateData.todos || null : null;
-          dispatch(this.update(usr, msg, todos));
+          const friends = (userPrivateData) ? userPrivateData.friends || null : null;
+          dispatch(this.update(usr, msg, todos, friends));
           dispatch(data.received(DNODE.USER));
           resolve(user);
         });
@@ -118,11 +128,12 @@ export const user = {
     };
   },
 
-  update(usr, msg, todos) {
+  update(usr, msg, todos, friends) {
     return dispatch => {
       dispatch(this.auth.update(usr));
       dispatch(this.messages.update(msg));
       dispatch(this.todos.update(todos));
+      dispatch(this.friends.update(friends));
     }
   }
 
