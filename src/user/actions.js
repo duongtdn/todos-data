@@ -30,14 +30,24 @@ export const user = {
       };
     },
     /* asynchronous actions */
-    delete (id) {
+    delete (msgIds = []) {
       return dispatch => {
         const uid = auth.currentUser.uid;
+        const updates = {};
         if (!uid) {
           dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
           return null;
         }
-        db.users.child(uid).child('msg').child(id).set(null);
+        if (msgIds.length > 0) {
+          msgIds.forEach(id => {
+            updates[`users/${uid}/msg/${id}`] = null;
+          });
+          dispatch(data.uploading(DNODE.USER));
+          db.root.update(updates).then( () => {
+            dispatch(data.uploaded(DNODE.USER));
+          });
+        }
+        
       }
     }
 

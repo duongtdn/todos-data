@@ -51,9 +51,9 @@ auth.onAuthStateChanged( usr => {
           //   id : todoId
           // }));
 
-          // console.log('Delette message');
-          // const msgId = '-KX3ZoAIks-3V0sa_fsF';
-          // store.dispatch(action.user.messages.delete(msgId));
+          console.log('Delette message');
+          const msgId = ['-KX8qjJIk4DVeNXeFJOA', '-KX8r5HsH6wrmKY8Z1BJ', '-KX8rV_7MJTnuA0iW2Yq'];
+          store.dispatch(action.user.messages.delete(msgId));
 
           displayStore();
           
@@ -147,10 +147,10 @@ function displayStore() {
 
 console.log ('\n# Login... --------------------------------------------------');
 
-// store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
+store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
 // .then( usr => console.log(usr) )
 // .catch(err => console.log(err) );
-store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
+// store.dispatch(action.user.signIn('duongtdn@stormgle.com','123456'))
 
 
 // // Stop listening to state updates
