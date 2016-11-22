@@ -69,6 +69,9 @@ auth.onAuthStateChanged( usr => {
           console.log('Logged as Duong');
 
 
+          // add friends
+          // store.dispatch(action.user.friends.add([{id : Users.mai, name : 'Mai Nguyen', relationship : 'wife'}]));
+
           const todoId = '-KX8v6BCdh0sSLRoHPnU';
           const todo = store.getState().todos[todoId];
 

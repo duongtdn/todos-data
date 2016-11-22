@@ -42,10 +42,7 @@ export const user = {
           msgIds.forEach(id => {
             updates[`users/${uid}/msg/${id}`] = null;
           });
-          dispatch(data.uploading(DNODE.USER));
-          db.root.update(updates).then( () => {
-            dispatch(data.uploaded(DNODE.USER));
-          });
+          _updateUserNode(dispatch,updates);
         }
         
       }
@@ -64,10 +61,28 @@ export const user = {
   },
 
   friends : {
+    /* synchronous actions */
     update (friends) {
       return {
         type    : USER.FRIENDS.UPDATE,
         payload : { friends }
+      }
+    },
+    /* asynchronous actions */
+    add (friends = []) {
+      return dispatch => {
+        const uid = auth.currentUser.uid;
+        const updates = {};
+        if (!uid) {
+          dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
+          return null;
+        }
+        if (friends.length > 0) {
+          friends.forEach( friend => {
+            updates[`users/${uid}/friends/${friend.id}`] = friend;
+          });
+          _updateUserNode(dispatch,updates);
+        }
       }
     }
   },
@@ -137,4 +152,11 @@ export const user = {
     }
   }
 
+}
+
+function _updateUserNode(dispatch, updates) {
+  dispatch(data.uploading(DNODE.USER));
+  db.root.update(updates).then( () => {
+    dispatch(data.uploaded(DNODE.USER));
+  });
 }
