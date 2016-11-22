@@ -20,6 +20,7 @@ export const USER = {
   },
   
   /* asynchronous actions */
+  SIGNUP        : 'user.signup',
   SIGNIN        : 'user.signin',
   SIGNOUT       : 'user.signout',
   LOAD          : 'user.load',

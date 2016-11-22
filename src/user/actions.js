@@ -119,6 +119,26 @@ export const user = {
 
   /* asynchronous actions */
 
+  signUp(email, password) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        return auth.createUserWithEmailAndPassword(email, password)
+          .then( user => {
+            console.log(user);
+            db.root.child('usersList').child(user.uid).set({ email });
+            // successful signed up, clear error flag if any 
+            dispatch(error.clear(ECODE.SIGNIN));
+            dispatch(error.clear(ECODE.NOT_AUTHEN)); 
+            resolve(user); 
+          })
+          .catch( err => {
+            dispatch(error.update(ECODE.SIGNIN, err));
+            reject(err);
+          });
+      })
+    }
+  },
+
   signIn(email, password) {
 
     return dispatch => {      
