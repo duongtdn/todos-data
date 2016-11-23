@@ -128,8 +128,15 @@ auth.onAuthStateChanged( usr => {
           // db.ref(`todos/-KWoP_T9TjNrH9G-asqS/share/${usr.uid}`).set('collaborator');
 
           //search for user
-          db.usersList.orderByChild('email').equalTo('mainth@stormgle.com').on('child_added', snap => console.log(snap.val()));
-          db.usersList.orderByChild('name').equalTo('Admin Stormgle').on('child_added', snap => console.log(snap.val()));
+          console.log('\nSearch user by email\n');
+          store.dispatch(action.search.apply('admin@stormgle.com')).then(() => {
+            console.log(store.getState().search);
+            store.dispatch(action.search.clear());
+            console.log(store.getState().search);
+          });
+          
+          // db.usersList.orderByChild('email').equalTo('mainth@stormgle.com').on('child_added', snap => console.log(snap.val()));
+          // db.usersList.orderByChild('name').equalTo('Admin Stormgle').on('child_added', snap => console.log(snap.val()));
         }
       });
     });
