@@ -88,7 +88,7 @@ export const todos = {
           highlight   : highlight
         }
         // prepare todo in user list
-        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.PENDING, role : OWNER};
+        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.LISTING, role : OWNER};
         // update
          _updateTodoAndUser (dispatch, updates);
         return todoId;
@@ -125,7 +125,6 @@ export const todos = {
             const msgKey = db.users.child(user).child('msg').push().key;
             message.id = msgKey;
             updates[`users/${user}/msg/${msgKey}`] = message;
-            updates[`users/${user}/todos/${todo.id}`] = null;
           });
         }
         updates[`users/${uid}/todos/${todo.id}`] = null;
@@ -166,10 +165,8 @@ export const todos = {
           const msgKey = db.users.child(user).child('msg').push().key;
           message.id = msgKey;
           updates[`users/${user}/msg/${msgKey}`] = message;
-          updates[`users/${user}/todos/${todo.id}/status`] = STATUS.COMPLETED;
         });
       }
-      updates[`users/${uid}/todos/${todo.id}/status`] = STATUS.COMPLETED;
       // update
       _updateTodoAndUser (dispatch, updates);
     }
@@ -209,7 +206,7 @@ export const todos = {
       if (todoId) {
         // update role in todo, add todo in user todo list, remove message
         updates[`todos/${todoId}/share/${uid}`] = COLLABORATOR;
-        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.PENDING, role : COLLABORATOR};
+        updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.LISTING, role : COLLABORATOR};
         updates[`users/${uid}/msg/${message.id}`] = null;
         // update
         _updateTodoAndUser (dispatch, updates);

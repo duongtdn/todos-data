@@ -20,7 +20,8 @@ export const STATUS = {
   PENDING   : 'pending',
   COMPLETED : 'completed',
   CANCELLED : 'cancelled',
-  UNREAD    : 'unread'
+  CLEANED   : 'cleaned',
+  LISTING   : 'listing'
 }
 
 export const OWNER = 'owner';
