@@ -13,5 +13,7 @@ export const ECODE = {
   SIGNOUT             : 'error.signOut',
   NOT_AUTHEN          : 'error.notAuthen',
   PERMISSION_DENINED  : 'error.denied',
-  INVALID             : 'error.invalid'
+  INVALID             : 'error.invalid',
+  INVALID_EMAIL       : 'error.invalidEmail',
+  INVALID_PASSWORD    : 'error.invalidPassword'
 }

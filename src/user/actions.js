@@ -119,21 +119,30 @@ export const user = {
 
   /* asynchronous actions */
 
-  signUp(email, password, name) {
+  signUp({email = null, password = null, name = null}) {
     return dispatch => {
       return new Promise((resolve, reject) => {
+        // need to validate email and password
+        if (email === null) {
+          dispatch(error.update(ECODE.INVALID_EMAIL, 'invalid email'));
+          reject('invalid email');
+        }
+        if (password === null) {
+          dispatch(error.update(ECODE.INVALID_PASSWORD, 'invalid password'));
+          reject('invalid password');
+        }
         return auth.createUserWithEmailAndPassword(email, password)
           .then( user => {
-            console.log(user);
             if (!name) { name = email; }
             db.root.child('usersList').child(user.uid).set({ email, name });
             // successful signed up, clear error flag if any 
-            dispatch(error.clear(ECODE.SIGNIN));
-            dispatch(error.clear(ECODE.NOT_AUTHEN)); 
+            dispatch(error.clear(ECODE.INVALID_EMAIL));
+            dispatch(error.clear(ECODE.INVALID_PASSWORD));
+            dispatch(error.clear(ECODE.SIGNUP));
             resolve(user); 
           })
           .catch( err => {
-            dispatch(error.update(ECODE.SIGNIN, err));
+            dispatch(error.update(ECODE.SIGNUP, err));
             reject(err);
           });
       })
