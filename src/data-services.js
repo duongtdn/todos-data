@@ -15,10 +15,15 @@ db.todos.lists = {};
 
 
 db.todos.get = (list, callback) => {
+  const uid = fb.auth().currentUser.uid;
+  if (!uid) {
+    throw 'Error : No-Auth';
+  }
   const todosList = {};
   if (list) {
     const n = Object.keys(list).length;
     const done = [];
+    const invalidateTodos = [];
     for (let i = 0; i < n; i++) {
       done.push(false);
     }
@@ -37,14 +42,26 @@ db.todos.get = (list, callback) => {
           db.todos.lists[id].off('value');
           db.todos.lists[id] = null;
         }
-        // when all data is updated, invoke callback
-        // issue, if todo is deleted at the central store, but still exist in
-        // user todo list, then that callback is never called, and done will
-        // not able to complete
+
         done[i] = true;
         if (done.every( el => el)) {
           callback(todosList);
+          // remove invalidated todos, this will cause the callback re-run --> need to optimize it
+          if (invalidateTodos.length > 0) {
+            const updates = {};
+            invalidateTodos.forEach( todo => {
+              updates[`users/${uid}/todos/${todo}`] = null;
+            });
+            db.root.update(updates);
+          }
+            
+          
         }
+      }, err => {
+        // error while access this item may be because it does not exist 
+        // or permission changed
+        invalidateTodos.push(id);
+        done[i] = true;
       });
     }
   } else {
