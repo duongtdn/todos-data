@@ -15,15 +15,34 @@ db.todos.lists = {};
 
 
 db.todos.get = (list, callback) => {
+  const done = [];
+  function _doneCheck() {
+    if (done.every( el => el)) {
+      callback(todosList);
+      // remove invalidated todos, this will cause the callback re-run --> need to optimize it
+      if (invalidateTodos.length > 0) {
+        const updates = {};
+        invalidateTodos.forEach( todo => {
+          if (db.todos.lists[todo]) {
+            updates[`users/${uid}/todos/${todo}`] = null;
+            db.todos.lists[todo].off('value');
+            delete db.todos.lists[todo];
+          }
+        });
+        db.root.update(updates);
+        console.log(db.todos.lists);
+      }
+    }
+  }
+
   const uid = fb.auth().currentUser.uid;
   if (!uid) {
     throw 'Error : No-Auth';
   }
   const todosList = {};
+  const invalidateTodos = [];
   if (list) {
     const n = Object.keys(list).length;
-    const done = [];
-    const invalidateTodos = [];
     for (let i = 0; i < n; i++) {
       done.push(false);
     }
@@ -40,28 +59,19 @@ db.todos.get = (list, callback) => {
         } else {
           // incase this todo is removed
           db.todos.lists[id].off('value');
-          db.todos.lists[id] = null;
+          delete db.todos.lists[id];
         }
 
         done[i] = true;
-        if (done.every( el => el)) {
-          callback(todosList);
-          // remove invalidated todos, this will cause the callback re-run --> need to optimize it
-          if (invalidateTodos.length > 0) {
-            const updates = {};
-            invalidateTodos.forEach( todo => {
-              updates[`users/${uid}/todos/${todo}`] = null;
-            });
-            db.root.update(updates);
-          }
-            
-          
-        }
+        _doneCheck();
+
       }, err => {
         // error while access this item may be because it does not exist 
         // or permission changed
+        console.log(`invalidate ${id}`);
         invalidateTodos.push(id);
         done[i] = true;
+        _doneCheck();
       });
     }
   } else {
