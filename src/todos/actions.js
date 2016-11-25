@@ -282,6 +282,52 @@ export const todos = {
       _updateTodoAndUser (dispatch, updates);
 
     }
+  },
+
+  cleanAll(todos) {
+    return dispatch => {
+      const uid = auth.currentUser.uid; 
+      const updates = {};
+      for (let id in todos) {
+        if (todos[id].status === STATUS.COMPLETED) {
+          updates[`users/${uid}/todos/${id}/status`] = STATUS.CLEANED;
+        }
+      }
+      _updateUser(dispatch, updates);
+    }
+  },
+
+  clean(todo) {
+    return dispatch => {
+      const uid = auth.currentUser.uid; 
+      const updates = {};
+      if (todos.status === STATUS.COMPLETED) {
+        updates[`users/${uid}/todos/${todo.id}/status`] = STATUS.CLEANED;
+      }
+      _updateUser(dispatch, updates);
+    }
+  },
+
+  uncleanAll(todos) {
+    return dispatch => {
+      const uid = auth.currentUser.uid; 
+      const updates = {};
+      for (let id in todos) {
+          updates[`users/${uid}/todos/${id}/status`] = STATUS.LISTING;
+      }
+      _updateUser(dispatch, updates);
+    }
+  },
+
+  unclean(todo) {
+    return dispatch => {
+      const uid = auth.currentUser.uid; 
+      const updates = {};
+      if (todos.status === STATUS.COMPLETED) {
+        updates[`users/${uid}/todos/${todo.id}/status`] = STATUS.LISTING;
+      }
+      _updateUser(dispatch, updates);
+    }
   }
 
 }
@@ -291,6 +337,13 @@ function _updateTodoAndUser (dispatch, updates) {
     dispatch(data.uploading(DNODE.USER));
     db.root.update(updates).then( () => {
       dispatch(data.uploaded(DNODE.TODOS));
+      dispatch(data.uploaded(DNODE.USER));
+    });
+}
+
+function _updateUser(dispatch, updates) {
+    dispatch(data.uploading(DNODE.USER));
+    db.root.update(updates).then( () => {
       dispatch(data.uploaded(DNODE.USER));
     });
 }

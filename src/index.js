@@ -12,8 +12,9 @@ import db from './data-services';
 
 const Users = {
   'duong': 'VgLf702x7bXZeus6Rwvohre208e2',
-  'mai': 'MrrsU8OMAFMre1bOdLgWTZdBqD62'
-}
+  'mai': 'MrrsU8OMAFMre1bOdLgWTZdBqD62',
+  'admin' : '5YsbVTf7rgeBmzGPuBUGMevreu03'
+};
 
 const store = createStore(
   rootReducer,
@@ -27,11 +28,11 @@ auth.onAuthStateChanged(usr => {
   if (usr) {
 
     console.log('\n# User is logged ----------------------------------------');
-    console.log('\n# Adding new todo ------------------------------');
-    store.dispatch(action.todos.add({
-      text: 'initial todo after logged in',
-      urgent: true
-    }));
+    // console.log('\n# Adding new todo ------------------------------');
+    // store.dispatch(action.todos.add({
+    //   text: 'initial todo after logged in',
+    //   urgent: true
+    // }));
     // store.dispatch(action.user.friends.add([{id : Users.mai, name : 'Mai Nguyen', relationship : 'wife'}]));
     // store.dispatch(action.user.friends.remove(Users.mai));
     // store.dispatch(action.user.friends.edit(Users.mai, {name : 'Mai Nguyen', relationship : 'spouse'}));
@@ -48,7 +49,7 @@ auth.onAuthStateChanged(usr => {
           console.log('Logged as Mai');
           console.log('\n# Adding new todo ------------------------------');
           const todoId = store.dispatch(action.todos.add({
-            text: 'Finishing todo completion function',
+            text: 'Implement Clean and Unclean todos',
             urgent: true,
             share: [Users.duong]
           }));
@@ -57,6 +58,7 @@ auth.onAuthStateChanged(usr => {
           //   users : [Users.duong],
           //   id : todoId
           // }));
+
 
           // console.log('Delette message');
           // const msgId = ['-KX8qjJIk4DVeNXeFJOA', '-KX8r5HsH6wrmKY8Z1BJ', '-KX8rV_7MJTnuA0iW2Yq'];
@@ -79,11 +81,11 @@ auth.onAuthStateChanged(usr => {
           // add friends
           // store.dispatch(action.user.friends.add([{id : Users.mai, name : 'Mai Nguyen', relationship : 'wife'}]));
 
-          const todoId = '-KXIPGcMteB1L5MFVtGC';
+          const todoId = '-KXO7Xnk4S2WcZzkw2wM';
           const todo = store.getState().todos[todoId];
 
           // // accept todo   
-          // const msgId = '-KXIPGcNIqwRChkPBR5a';                 
+          // const msgId = '-KXO6WGHZJ9T5ziLhtoM';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {
@@ -97,18 +99,25 @@ auth.onAuthStateChanged(usr => {
           // }
 
           // // complete a todo
-          // // const todo = {
-          // //   id : '-KX2kmS-UuByIMOKuA5G',
-          // //   share : {
-          // //     MrrsU8OMAFMre1bOdLgWTZdBqD62: 'owner',
-          // //     VgLf702x7bXZeus6Rwvohre208e2: 'invited'
-          // //   }
-          // // };
           // if (todo) {
           //   // complete a todo
           //   store.dispatch(action.todos.complete(todo));
           //   displayStore();
           // }
+
+          // clean
+          store.dispatch(action.todos.clean(todo));
+
+          // // clean all
+          // const todos = store.getState().todos;
+          // store.dispatch(action.todos.cleanAll(todos));
+
+          // console.log('\n# Adding new todo ------------------------------');
+          // store.dispatch(action.todos.add({
+          //   text: 'Implement Test system',
+          //   urgent: true,
+          //   share: [Users.mai, Users.admin]
+          // }));
 
           // // delete a todo
           // if (todo) {
@@ -169,10 +178,10 @@ function displayStore() {
 
 console.log('\n# Login... --------------------------------------------------');
 
-store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
+// store.dispatch(action.user.signIn('mainth@stormgle.com','123456'))
 // .then( usr => console.log(usr) )
 // .catch(err => console.log(err) );
-// store.dispatch(action.user.signIn('duongtdn@stormgle.com', '123456'))
+store.dispatch(action.user.signIn('duongtdn@stormgle.com', '123456'))
 
 // store.dispatch(action.user.signUp('admin@stormgle.com','123456','Admin Stormgle'));
 
