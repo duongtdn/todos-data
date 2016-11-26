@@ -81,11 +81,11 @@ auth.onAuthStateChanged(usr => {
           // add friends
           // store.dispatch(action.user.friends.add([{id : Users.mai, name : 'Mai Nguyen', relationship : 'wife'}]));
 
-          const todoId = '-KXO7Xnk4S2WcZzkw2wM';
+          const todoId = '-KXW98BwRqKiDANd3qym';
           const todo = store.getState().todos[todoId];
 
           // // accept todo   
-          // const msgId = '-KXO6WGHZJ9T5ziLhtoM';                 
+          // const msgId = '-KXW98C-E8EG79uQ5zmX';                 
           // const msg = store.getState().user.messages[msgId];  
           // // const msg = false;        
           // if (msg) {

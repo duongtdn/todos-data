@@ -66,6 +66,7 @@ export const todos = {
             receivers : share,
             content   : todoId
           });
+          console.log (message);
           share.forEach(user => {
             const msgKey = db.users.child(user).child('msg').push().key;
             message.id = msgKey;
@@ -365,15 +366,7 @@ function _validateMessage(uid, msg) {
     throw ECODE.PERMISSION_DENINED;
   }
 
-  if (!msg.type || msg.type !== MESSAGES.TYPE.NOTIFICATION) {
-    throw ECODE.INVALID;
-  }
-
-  if (!msg.subject || msg.subject !== MESSAGES.SUBJECT.SHARE_TODO) {
-    throw ECODE.INVALID;
-  }
-
-  if (!msg.content) {
+  if (!msg.category || !msg.type || !msg.subject || !msg.content) {
     throw ECODE.INVALID;
   }
 
