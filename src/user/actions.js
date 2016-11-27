@@ -7,6 +7,7 @@ import { DNODE } from '../data/constants'
 import { error } from '../error/actions'
 import { ECODE } from '../error/constants'
 import { USER } from './constants'
+import { MESSAGES} from '../messages'
 
 /* action creators */
 export const user = {
@@ -45,6 +46,17 @@ export const user = {
           _updateUserNode(dispatch,updates);
         }
         
+      }
+    },
+    cleanAll (msgList = []) {
+      return dispatch => {
+        const msgIds = [];
+        msgList.forEach ( msg => {
+          if (msg.type === MESSAGES.TYPE.ALERT) {
+            msgIds.push(msgList.id);
+          }
+        });
+        dispatch(this.delete(msgIds));
       }
     }
 
