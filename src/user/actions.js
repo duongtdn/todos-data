@@ -91,7 +91,8 @@ export const user = {
         }
         if (friends.length > 0) {
           friends.forEach( friend => {
-            updates[`users/${uid}/friends/${friend.id}`] = friend;
+            const category = friend.category || 'Friends';
+            updates[`users/${uid}/friends/${category}/${friend.id}`] = friend;
           });
           _updateUserNode(dispatch,updates);
         }
