@@ -51,7 +51,7 @@ export const todos = {
       };
   },
 
-  add({text = '', share = {}, urgent = false, duedate = ''}) {
+  add({text = '', share = {}, urgent = false, dueDate = ''}) {
 
     return dispatch => {
       if (auth.currentUser) {
@@ -86,7 +86,7 @@ export const todos = {
           completedBy : '',
           completedAt : '',
           urgent      : urgent,
-          duedate     : duedate
+          dueDate     : dueDate
         }
         // prepare todo in user list
         updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.LISTING, role : OWNER};
