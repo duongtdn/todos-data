@@ -231,7 +231,7 @@ export const todos = {
     }
   },
 
-  edit( todo, {text = null, highlight = null, urgent = null}) {
+  edit(todo) {
     return dispatch => {
 
       const uid = auth.currentUser.uid;
@@ -252,17 +252,11 @@ export const todos = {
         }
       }
 
-      if (text !== null) {
-        updates[`todos/${todo.id}/text`] = text;
-      }
-
-      if (highlight !== null) {
-        updates[`todos/${todo.id}/highlight`] = highlight;
-      }
-
-      if (urgent !== null) {
-        updates[`todos/${todo.id}/urgent`] = urgent;
-      }
+      for (let prop in todo) {
+        if (prop !== 'id' && prop !== 'createdAt') {
+          updates[`todos/${todo.id}/${prop}`] = todo[prop];
+        }        
+      }      
 
       if (Object.keys(updates).length > 0) {
         // send message to stakeholders to notify change
