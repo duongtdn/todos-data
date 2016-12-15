@@ -12,7 +12,8 @@ export const TODOS = {
   SHARE     : 'todos.share',
   ACCEPT    : 'todos.accept',
   DECLINE   : 'todos.decline',
-  EDIT      : 'todos.edit'
+  EDIT      : 'todos.edit',
+  UNDO_COMPLETE : 'todo.undoComplete'
 }
 
 /* Other constants */

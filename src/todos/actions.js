@@ -173,6 +173,41 @@ export const todos = {
     }
   },
 
+  undoComplete(todo) {
+    return dispatch => {
+      const uid = auth.currentUser.uid;
+      if (!uid) {
+        dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
+        return null;
+      }
+      const updates = {};
+      const stakeholders = [];
+      for (let user in todo.share) {
+        if (user !== uid) {
+          stakeholders.push(user);
+        }
+      }
+      // change status of todo as pending, then broadcast a message 
+      // to all stakeholders if any
+      updates[`todos/${todo.id}/status`] = STATUS.PENDING;
+      updates[`todos/${todo.id}/completedBy`] = '';
+      updates[`todos/${todo.id}/completedAt`] = '';
+      if (stakeholders.length > 0) {
+        const message = messages.template(TEMPLATE.UNDO_COMPLETED).create({
+          receivers : stakeholders,
+          content   : todo.id
+        });
+        stakeholders.forEach(user => {
+          const msgKey = db.users.child(user).child('msg').push().key;
+          message.id = msgKey;
+          updates[`users/${user}/msg/${msgKey}`] = message;
+        });
+      }
+      // update
+      _updateTodoAndUser (dispatch, updates);
+    }
+  },
+
   share({users = [], id = ''}) {
 
     return dispatch => {

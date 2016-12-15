@@ -5,10 +5,11 @@ import auth from './auth-services'
 import db from './data-services'
 
 export const TEMPLATE = {
-  INVITE_TODO   : 'inviteTodo',
-  COMPLETE_TODO : 'completeTodo',
-  DELETE_TODO   : 'deleteTodo',
-  CHANGE_TODO   : 'changeTodo'
+  INVITE_TODO    : 'inviteTodo',
+  COMPLETE_TODO  : 'completeTodo',
+  DELETE_TODO    : 'deleteTodo',
+  CHANGE_TODO    : 'changeTodo',
+  UNDO_COMPLETED : 'undoCompleted'
 };
 
 export const MESSAGES = {
@@ -20,10 +21,11 @@ export const MESSAGES = {
     CONFIRM         : 'confirm'
   },
   SUBJECT: {
-    SHARE_TODO      : 'todo.share',
-    TODO_CHANGED    : 'todo.changed',
-    TODO_COMPLETED  : 'todo.completed',
-    TODO_DELETED    : 'todo.deleted'
+    SHARE_TODO          : 'todo.share',
+    TODO_CHANGED        : 'todo.changed',
+    TODO_COMPLETED      : 'todo.completed',
+    TODO_DELETED        : 'todo.deleted',
+    TODO_UNDO_COMPLETED : 'todo.undoCompleted'
   },
   CATEGORY  : {
     SYSTEM          : 'system',
@@ -79,7 +81,14 @@ export default {
         this.msgStruct.subject = MESSAGES.SUBJECT.TODO_CHANGED;
 
         return this;
+      
+      case TEMPLATE.UNDO_COMPLETED :
 
+        this.msgStruct.type = MESSAGES.TYPE.ALERT;
+        this.msgStruct.category = MESSAGES.CATEGORY.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.TODO_UNDO_COMPLETED;
+
+        return this;
 
       default :
         return this;
