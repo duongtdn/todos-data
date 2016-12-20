@@ -8,6 +8,7 @@ import { data } from './data/reducers'
 import { error } from './error/reducers'
 import { filter } from './filter/reducers'
 import { search } from './search/reducers'
+import { currentTodo } from './currentTodo/reducers'
 
 export default combineReducers({
   todos  : todos,
@@ -15,5 +16,6 @@ export default combineReducers({
   data   : data,
   error  : error,
   filter : filter,
-  search : search
+  search : search,
+  currentTodo : currentTodo
 })

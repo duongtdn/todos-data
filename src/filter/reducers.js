@@ -3,7 +3,6 @@
 import { FILTER } from './constants'
 
 export function filter (state = {}, action) {
-  const newState = {...state};
 
   switch (action.type) {
 
