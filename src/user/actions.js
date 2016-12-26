@@ -146,7 +146,8 @@ export const user = {
         return auth.createUserWithEmailAndPassword(email, password)
           .then( user => {
             if (!name) { name = email; }
-            db.root.child('usersList').child(user.uid).set({ email, name });
+            const id = user.uid;
+            db.root.child('usersList').child(user.uid).set({ id, email, name });
             // successful signed up, clear error flag if any 
             dispatch(error.clear(ECODE.INVALID_EMAIL));
             dispatch(error.clear(ECODE.INVALID_PASSWORD));
