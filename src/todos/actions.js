@@ -64,7 +64,7 @@ export const todos = {
         if (share.length > 0) {
           const message = messages.template(TEMPLATE.INVITE_TODO).create({
             receivers : share,
-            content   : todoId
+            content   : text
           });
           console.log (message);
           share.forEach(user => {
@@ -116,7 +116,8 @@ export const todos = {
             stakeholders.push(user);
           }
         }
-        updates[`todos/${todo.id}`] = null; // delete todo or change status to deleted???
+        updates[`todos/${todo.id}`] = null; 
+        /* 
         if (stakeholders.length > 0) {
           const message = messages.template(TEMPLATE.DELETE_TODO).create({
             receivers : stakeholders,
@@ -128,6 +129,7 @@ export const todos = {
             updates[`users/${user}/msg/${msgKey}`] = message;
           });
         }
+        */
         updates[`users/${uid}/todos/${todo.id}`] = null;
         // update
         _updateTodoAndUser (dispatch, updates);
@@ -157,6 +159,7 @@ export const todos = {
       updates[`todos/${todo.id}/status`] = STATUS.COMPLETED;
       updates[`todos/${todo.id}/completedBy`] = uid;
       updates[`todos/${todo.id}/completedAt`] = getTime();
+      /*
       if (stakeholders.length > 0) {
         const message = messages.template(TEMPLATE.COMPLETE_TODO).create({
           receivers : stakeholders,
@@ -168,6 +171,7 @@ export const todos = {
           updates[`users/${user}/msg/${msgKey}`] = message;
         });
       }
+      */
       // update
       _updateTodoAndUser (dispatch, updates);
     }
@@ -192,6 +196,7 @@ export const todos = {
       updates[`todos/${todo.id}/status`] = STATUS.PENDING;
       updates[`todos/${todo.id}/completedBy`] = '';
       updates[`todos/${todo.id}/completedAt`] = '';
+      /*
       if (stakeholders.length > 0) {
         const message = messages.template(TEMPLATE.UNDO_COMPLETED).create({
           receivers : stakeholders,
@@ -203,6 +208,7 @@ export const todos = {
           updates[`users/${user}/msg/${msgKey}`] = message;
         });
       }
+      */
       // update
       _updateTodoAndUser (dispatch, updates);
     }
@@ -292,7 +298,7 @@ export const todos = {
           updates[`todos/${todo.id}/${prop}`] = todo[prop];
         }        
       }      
-
+/*
       if (Object.keys(updates).length > 0) {
         // send message to stakeholders to notify change
         if (stakeholders.length > 0) {
@@ -307,7 +313,7 @@ export const todos = {
           });
         }
       }
-
+*/
       // update
       _updateTodoAndUser (dispatch, updates);
 
