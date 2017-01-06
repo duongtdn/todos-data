@@ -64,7 +64,8 @@ export const todos = {
         if (share.length > 0) {
           const message = messages.template(TEMPLATE.INVITE_TODO).create({
             receivers : share,
-            content   : text
+            content   : text,
+            todo      : todoId
           });
           console.log (message);
           share.forEach(user => {
@@ -214,7 +215,7 @@ export const todos = {
     }
   },
 
-  share({users = [], id = ''}) {
+  share({users = [], todo = {}}) {
 
     return dispatch => {
 
@@ -222,7 +223,8 @@ export const todos = {
       // create an invitation message
       const message = messages.template(TEMPLATE.INVITE_TODO).create({
         receivers : users,
-        content   : id
+        content   : todo.text,
+        todo      : todo.id
       });
 
       // prepare update
@@ -230,7 +232,7 @@ export const todos = {
         const msgKey = db.users.child(user).child('msg').push().key;
         message.id = msgKey;
         updates[`users/${user}/msg/${msgKey}`] = message;
-        updates[`todos/${id}/share/${user}`] = 'invited';
+        updates[`todos/${todo.id}/share/${user}`] = 'invited';
       });
 
       // update
@@ -243,7 +245,7 @@ export const todos = {
     return dispatch => {
       const uid = auth.currentUser.uid;
       _validateMessage(uid, message);
-      const todoId = message.content;
+      const todoId = message.todo;
       const updates = {};
       if (todoId) {
         // update role in todo, add todo in user todo list, remove message
@@ -260,7 +262,7 @@ export const todos = {
     return dispatch => {
       const uid = auth.currentUser.uid;
       _validateMessage(uid, message);
-      const todoId = message.content;
+      const todoId = message.todo;
       const updates = {};
       if (todoId) {
         // remove user in todo, remove message

@@ -44,7 +44,8 @@ export default {
     type      : '',
     category  : '',
     subject   : '',
-    content   : ''
+    content   : '',
+    todo      : ''
   },
   
   template(name) {
@@ -97,7 +98,7 @@ export default {
   },
 
 
-  create ({receivers = null, type = null, subject = null, content = null}) {
+  create ({receivers = null, type = null, subject = null, content = null, todo = null}) {
     
     const uid = auth.currentUser.uid;
     this.msgStruct.status = MESSAGES.STATUS.UNREAD;
@@ -116,6 +117,9 @@ export default {
     if (content) {
       this.msgStruct.content = content;
     }
+    if (todo) {
+      this.msgStruct.todo = todo;
+    }
     return this.msgStruct;
   },
 
@@ -128,7 +132,8 @@ export default {
       createdAt : null,
       type      : '',
       subject   : '',
-      content   : ''
+      content   : '',
+      todo      : ''
     };
     return this;
   },
