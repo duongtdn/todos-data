@@ -62,21 +62,31 @@ export const todos = {
         
         // prepare invitation messages
         if (share.length > 0) {
-          const message = messages.template(TEMPLATE.INVITE_TODO).create({
-            receivers : share,
-            content   : text,
-            todo      : todoId
-          });
-          console.log (message);
           share.forEach(user => {
-            const msgKey = db.users.child(user).child('msg').push().key;
+            const message = messages.template(TEMPLATE.INVITE_TODO).create({
+              receivers : [user.id],
+              content   : text,
+              todo      : todoId
+            });
+            const msgKey = db.users.child(user.id).child('msg').push().key;
             message.id = msgKey;
-            updates[`users/${user}/msg/${msgKey}`] = message;
-            stakeholders[user] = 'invited';
+            updates[`users/${user.id}/msg/${msgKey}`] = message;
+            stakeholders[user.id] = {
+              status : 'invited',
+              role : COLLABORATOR,
+              name : user.name,
+              id : user.id
+            };
           });
+          
         }
         // prepare todo
-        stakeholders[uid] = OWNER;
+        stakeholders[uid] = {
+          status : 'accepted',
+          role : OWNER,
+          name : auth.currentUser.displayName,
+          id : uid
+        };
         const timestamp = getTime();
         updates[`todos/${todoId}`] = {
           id          : todoId,
@@ -232,7 +242,12 @@ export const todos = {
         const msgKey = db.users.child(user).child('msg').push().key;
         message.id = msgKey;
         updates[`users/${user}/msg/${msgKey}`] = message;
-        updates[`todos/${todo.id}/share/${user}`] = 'invited';
+        updates[`todos/${todo.id}/share/${user.id}`] = {
+          status : 'invited',
+          role : COLLABORATOR,
+          name : user.name,
+          id : user.id
+        };
       });
 
       // update
@@ -249,7 +264,7 @@ export const todos = {
       const updates = {};
       if (todoId) {
         // update role in todo, add todo in user todo list, remove message
-        updates[`todos/${todoId}/share/${uid}`] = COLLABORATOR;
+        updates[`todos/${todoId}/share/${uid}/status`] = 'accepted';
         updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.LISTING, role : COLLABORATOR};
         updates[`users/${uid}/msg/${message.id}`] = null;
         // update
@@ -289,9 +304,23 @@ export const todos = {
 
       const updates = {};
       const stakeholders = [];
-      for (let user in todo.share) {
+      for (let id in todo.share) {
+        const user = todo.share[id];
         if (user !== uid) {
           stakeholders.push(user);
+          // send confirm message to whom invited
+          console.log(user)
+          if (user.status === 'invited') {
+            const message = messages.template(TEMPLATE.INVITE_TODO).create({
+              receivers : [user.id],
+              content   : todo.text,
+              todo      : todo.id
+            });
+            const msgKey = db.users.child(user.id).child('msg').push().key;
+            message.id = msgKey;
+            console.log(message)
+            updates[`users/${user.id}/msg/${msgKey}`] = message;
+          }
         }
       }
 
@@ -299,7 +328,7 @@ export const todos = {
         if (prop !== 'id' && prop !== 'createdAt') {
           updates[`todos/${todo.id}/${prop}`] = todo[prop];
         }        
-      }      
+      }  
 /*
       if (Object.keys(updates).length > 0) {
         // send message to stakeholders to notify change

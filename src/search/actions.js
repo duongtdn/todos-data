@@ -15,10 +15,10 @@ export const search = {
   },
 
   /* asynchronous action */
-  apply(query) {
+  apply(key, value) {
     return dispatch => {
       return new Promise((resolve, reject) => {
-        _searchUserByEmail(query, data => {
+        _searchUser(key, value, data => {
           dispatch(this.update(data));
           resolve(data);
         })
@@ -34,8 +34,8 @@ export const search = {
 
 }
 
-function _searchUserByEmail (email, callback) {
-  db.usersList.orderByChild('email').equalTo(email)
+function _searchUser (key, value, callback) {
+  db.usersList.orderByChild(key).equalTo(value)
     .on('child_added', snap => {
       callback(snap.val());
     });
