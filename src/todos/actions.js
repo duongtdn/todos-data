@@ -70,7 +70,7 @@ export const todos = {
             });
             const msgKey = db.users.child(user.id).child('msg').push().key;
             message.id = msgKey;
-            updates[`users/${user.id}/msg/${msgKey}`] = message;
+            updates[`users/${user.id}/msg/${msgKey}`] = {...message};
             stakeholders[user.id] = {
               status : 'invited',
               role : COLLABORATOR,
@@ -319,7 +319,7 @@ export const todos = {
             const msgKey = db.users.child(user.id).child('msg').push().key;
             message.id = msgKey;
             console.log(message)
-            updates[`users/${user.id}/msg/${msgKey}`] = message;
+            updates[`users/${user.id}/msg/${msgKey}`] = {...message};
           }
         }
       }

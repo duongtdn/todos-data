@@ -106,7 +106,7 @@ export default {
     this.msgStruct.createdAt = getTime();
     // need to validate to makesure receiver list is array 
     if (receivers) {
-      this.msgStruct.to = receivers;
+      this.msgStruct.to = [...receivers];
     }
     if (type) {
       this.msgStruct.type = type;
