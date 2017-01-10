@@ -72,7 +72,7 @@ export const todos = {
             message.id = msgKey;
             updates[`users/${user.id}/msg/${msgKey}`] = {...message};
             stakeholders[user.id] = {
-              status : 'invited',
+              status : `invited.${msgKey}`,
               role : COLLABORATOR,
               name : user.name,
               id : user.id
@@ -120,27 +120,22 @@ export const todos = {
         const uid = auth.currentUser.uid;
         const updates = {};
         const stakeholders = [];
-        // delete todo in todos at root and users, then broadcast a mesage to 
-        // all stakeholders
-        for (let user in todo.share) {
-          if (user !== uid) {
+        // delete todo in todos at root and users, then recall all invited mesages
+        // need a change in the way invited messages are sent, eg. invited.msgId
+        for (let id in todo.share) {
+          const user = todo.share[id];
+          if ((/invited/i).test(user.status)) {
             stakeholders.push(user);
           }
         }
         updates[`todos/${todo.id}`] = null; 
-        /* 
         if (stakeholders.length > 0) {
-          const message = messages.template(TEMPLATE.DELETE_TODO).create({
-            receivers : stakeholders,
-            content   : todo.text
-          });
           stakeholders.forEach(user => {
-            const msgKey = db.users.child(user).child('msg').push().key;
-            message.id = msgKey;
-            updates[`users/${user}/msg/${msgKey}`] = message;
+            const [status, msgId] = user.status.split('.');
+            updates[`users/${user.id}/msg/${msgId}`] = null;
           });
         }
-        */
+        
         updates[`users/${uid}/todos/${todo.id}`] = null;
         // update
         _updateTodoAndUser (dispatch, updates);
@@ -318,7 +313,7 @@ export const todos = {
             });
             const msgKey = db.users.child(user.id).child('msg').push().key;
             message.id = msgKey;
-            console.log(message)
+            user.status = `invited.${msgKey}`;
             updates[`users/${user.id}/msg/${msgKey}`] = {...message};
           }
         }

@@ -30,7 +30,6 @@ db.todos.get = (list, callback) => {
           }
         });
         db.root.update(updates);
-        console.log(db.todos.lists);
       }
     }
   }
@@ -52,7 +51,6 @@ db.todos.get = (list, callback) => {
       db.todos.lists[id] = db.todos.child(id);
       // register a listener
       db.todos.lists[id].on('value', snap => {
-        console.log (`# INFO : Change in todo : ${id}`);
         const todo = snap.val();
         if (todo) {
           todosList[id] = todo;  
@@ -68,7 +66,6 @@ db.todos.get = (list, callback) => {
       }, err => {
         // error while access this item may be because it does not exist 
         // or permission changed
-        console.log(`invalidate ${id}`);
         invalidateTodos.push(id);
         done[i] = true;
         _doneCheck();
@@ -85,9 +82,7 @@ db.todos.get = (list, callback) => {
 
 db.users.getData = callback => {
   const user = fb.auth().currentUser;
-  //console.log('db.users.getData : auth failed');
   if (user) {
-    //console.log('db.users.getData : auth passed');
     db.users.child(user.uid).on('value', snapshot => {
       callback(snapshot.val());
     });
@@ -100,7 +95,6 @@ db.users.getTodosList = callback => {
   const user = fb.auth().currentUser;
   if (user) {
     db.users.child(user.uid).child('todos').on('value', snapshot => {
-      console.log ('# INFO : Change in User Todo List');
       callback(snapshot.val());
     });
   } else {
