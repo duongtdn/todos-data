@@ -304,7 +304,6 @@ export const todos = {
         if (user !== uid) {
           stakeholders.push(user);
           // send confirm message to whom invited
-          console.log(user)
           if (user.status === 'invited') {
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
