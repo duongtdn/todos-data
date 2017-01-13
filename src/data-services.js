@@ -34,9 +34,9 @@ db.todos.get = (list, callback) => {
     }
   }
 
-  const uid = fb.auth().currentUser.uid;
+  const uid = fb.auth().currentUser && fb.auth().currentUser.uid;
   if (!uid) {
-    throw 'Error : No-Auth';
+    return;
   }
   const todosList = {};
   const invalidateTodos = [];
