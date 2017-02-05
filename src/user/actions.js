@@ -163,6 +163,24 @@ export const user = {
     }
   },
 
+  changeName(name) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        if (name && typeof name === 'string') {
+          const uid = auth.currentUser.uid;
+          db.root.child('usersList').child(uid).child('name').set(name);
+          auth.currentUser.updateProfile({ displayName : name }).then(
+            () => {
+              dispatch(this.auth.update(auth.currentUser));
+              resolve(auth.currentUser); 
+            }
+          );
+        }
+      });
+    }
+   
+  },
+
   signIn(email, password) {
 
     return dispatch => {      
