@@ -135,19 +135,21 @@ export const user = {
     return dispatch => {
       return new Promise((resolve, reject) => {
         // need to validate email and password
-        if (email === null) {
+        if (email === null || typeof email !== 'string') {
           dispatch(error.update(ECODE.INVALID_EMAIL, 'invalid email'));
           reject('invalid email');
         }
-        if (password === null) {
+        if (password === null || typeof password !== 'string') {
           dispatch(error.update(ECODE.INVALID_PASSWORD, 'invalid password'));
           reject('invalid password');
         }
+        email = email.toLowerCase().trim();
         return auth.createUserWithEmailAndPassword(email, password)
           .then( user => {
             if (!name) { name = email; }
+            const lowerCaseName = name.toLowerCase().trim().replace(/ +/g,' ');
             const id = user.uid;
-            db.root.child('usersList').child(user.uid).set({ id, email, name });
+            db.root.child('usersList').child(user.uid).set({ id, email, name, lowerCaseName });
             // successful signed up, clear error flag if any 
             dispatch(error.clear(ECODE.INVALID_EMAIL));
             dispatch(error.clear(ECODE.INVALID_PASSWORD));
@@ -167,8 +169,10 @@ export const user = {
     return dispatch => {
       return new Promise((resolve, reject) => {
         if (name && typeof name === 'string') {
+          const lowerCaseName = name.toLowerCase().trim().replace(/ +/g,' ');
           const uid = auth.currentUser.uid;
           db.root.child('usersList').child(uid).child('name').set(name);
+          db.root.child('usersList').child(uid).child('lowerCaseName').set(lowerCaseName);
           auth.currentUser.updateProfile({ displayName : name }).then(
             () => {
               dispatch(this.auth.update(auth.currentUser));
