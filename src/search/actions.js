@@ -36,7 +36,16 @@ export const search = {
 
 function _searchUser (key, value, callback) {
   db.usersList.orderByChild(key).equalTo(value)
-    .on('child_added', snap => {
-      callback(snap.val());
+    .on('value', snap => {
+      if (snap.exists()) {
+        const snapshot = snap.val();
+        const results = [];
+        for (let uid in snapshot) {
+          results.push(snapshot[uid]);
+        }
+        callback(results);
+      } else {
+        callback([]);
+      }
     });
 }
