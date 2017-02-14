@@ -296,15 +296,24 @@ export const todos = {
       if (todo.id === null) {
         return null;
       }
-
       const updates = {};
       const stakeholders = [];
       for (let id in todo.share) {
         const user = todo.share[id];
         if (user !== uid) {
           stakeholders.push(user);
-          // send confirm message to whom invited
-          if (user.status === 'invited') {
+          if (user === null) {
+            // send a info message to use whom removed from the list
+            const message = messages.template(TEMPLATE.UNSHARE).create({
+              receivers : [id],
+              content   : `You are removed from share list of this task: ${todo.text}`,
+              todo      : todo.id
+            });
+            const msgKey = db.users.child(id).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${id}/msg/${msgKey}`] = {...message};
+          } else if (user.status === 'invited') {
+            // send confirm message to whom invited
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
               content   : todo.text,

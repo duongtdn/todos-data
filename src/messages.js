@@ -25,7 +25,8 @@ export const MESSAGES = {
     TODO_CHANGED        : 'todo.changed',
     TODO_COMPLETED      : 'todo.completed',
     TODO_DELETED        : 'todo.deleted',
-    TODO_UNDO_COMPLETED : 'todo.undoCompleted'
+    TODO_UNDO_COMPLETED : 'todo.undoCompleted',
+    UNSHARE             : 'todo.unshare'
   },
   CATEGORY  : {
     SYSTEM          : 'system',
@@ -90,6 +91,16 @@ export default {
         this.msgStruct.subject = MESSAGES.SUBJECT.TODO_UNDO_COMPLETED;
 
         return this;
+
+      case TEMPLATE.UNSHARE :
+
+        this.msgStruct.type = MESSAGES.TYPE.ALERT;
+        this.msgStruct.category = MESSAGES.CATEGORY.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.UNSHARE;
+
+        return this;
+
+      
 
       default :
         return this;
