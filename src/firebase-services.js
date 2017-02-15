@@ -11,6 +11,4 @@ const config = {
   messagingSenderId : "355266543315"
 };
 
-console.log (' Firebase Init Success');
-
 export const fb = firebase.initializeApp(config);

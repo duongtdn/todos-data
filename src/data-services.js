@@ -23,7 +23,8 @@ db.todos.get = (list, callback) => {
       if (invalidateTodos.length > 0) {
         const updates = {};
         invalidateTodos.forEach( todo => {
-          if (db.todos.lists[todo]) {
+          if (fb.auth().currentUser && db.todos.lists[todo]) {
+            const uid = fb.auth().currentUser.uid;
             updates[`users/${uid}/todos/${todo}`] = null;
             db.todos.lists[todo].off('value');
             delete db.todos.lists[todo];
@@ -64,8 +65,9 @@ db.todos.get = (list, callback) => {
         _doneCheck();
 
       }, err => {
-        // error while access this item may be because it does not exist 
-        // or permission changed
+        // error while access this item may be because it does not exist, (someone
+        // has deleted it for example) or permission changed. So we need to invalidate
+        // these todo and remove them from user todo list
         invalidateTodos.push(id);
         done[i] = true;
         _doneCheck();
@@ -84,7 +86,9 @@ db.users.getData = callback => {
   const user = fb.auth().currentUser;
   if (user) {
     db.users.child(user.uid).on('value', snapshot => {
-      callback(snapshot.val());
+      if (snapshot.exists()) {
+        callback(snapshot.val());
+      }
     });
   } else {
     callback(null);
@@ -95,7 +99,9 @@ db.users.getTodosList = callback => {
   const user = fb.auth().currentUser;
   if (user) {
     db.users.child(user.uid).child('todos').on('value', snapshot => {
-      callback(snapshot.val());
+      if (snapshot.exists()) {
+        callback(snapshot.val());
+      }
     });
   } else {
     callback(null);
