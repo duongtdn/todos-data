@@ -86,9 +86,7 @@ db.users.getData = callback => {
   const user = fb.auth().currentUser;
   if (user) {
     db.users.child(user.uid).on('value', snapshot => {
-      if (snapshot.exists()) {
-        callback(snapshot.val());
-      }
+      callback(snapshot.val());
     });
   } else {
     callback(null);
@@ -99,9 +97,7 @@ db.users.getTodosList = callback => {
   const user = fb.auth().currentUser;
   if (user) {
     db.users.child(user.uid).child('todos').on('value', snapshot => {
-      if (snapshot.exists()) {
-        callback(snapshot.val());
-      }
+      callback(snapshot.val());
     });
   } else {
     callback(null);
