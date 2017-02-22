@@ -185,6 +185,23 @@ export const user = {
    
   },
 
+  changePassword(newPassword) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        if (!auth.currentUser) {
+          reject(err);
+        }
+        return auth.currentUser.updatePassword(newPassword).then((success) => {
+          // successful signed in, clear error flag if any 
+          resolve(success); 
+        })
+        .catch(err => {
+          reject(err);
+        });
+      });
+    }
+  },
+
   signIn(email, password) {
 
     return dispatch => {      
