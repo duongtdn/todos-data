@@ -9,6 +9,7 @@ import { error } from './error/reducers'
 import { filter } from './filter/reducers'
 import { search } from './search/reducers'
 import { currentTodo } from './currentTodo/reducers'
+import { connection } from './connection/reducers'
 
 export default combineReducers({
   todos  : todos,
@@ -17,5 +18,6 @@ export default combineReducers({
   error  : error,
   filter : filter,
   search : search,
-  currentTodo : currentTodo
+  currentTodo : currentTodo,
+  connection : connection
 })
