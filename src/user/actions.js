@@ -255,6 +255,16 @@ export const user = {
     };
   },
 
+  sendPasswordResetEmail(email) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        return auth.sendPasswordResetEmail(email)
+                   .then(() => resolve())
+                   .catch(err => reject(err));
+      });
+    }
+  },
+
   update(usr, msg, todos, friends) {
     return dispatch => {
       dispatch(this.auth.update(usr));
