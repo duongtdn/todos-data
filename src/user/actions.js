@@ -154,8 +154,7 @@ export const user = {
             dispatch(error.clear(ECODE.INVALID_EMAIL));
             dispatch(error.clear(ECODE.INVALID_PASSWORD));
             dispatch(error.clear(ECODE.SIGNUP));
-            user.updateProfile({ displayName : name });
-            resolve(user); 
+            user.updateProfile({ displayName : name }).then(() => resolve(user)); 
           })
           .catch( err => {
             dispatch(error.update(ECODE.SIGNUP, err));
