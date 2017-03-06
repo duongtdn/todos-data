@@ -128,6 +128,16 @@ export const user = {
     }
   },
 
+  account : {
+    /* synchronous actions */
+    update (account) {
+      return {
+        type    : USER.ACCOUNT.UPDATE,
+        payload : { account }
+      }
+    },
+  },
+
 
   /* asynchronous actions */
 
@@ -246,7 +256,8 @@ export const user = {
           const msg    = (userPrivateData) ? userPrivateData.msg || null : null;
           const todos  = (userPrivateData) ? userPrivateData.todos || null : null;
           const friends = (userPrivateData) ? userPrivateData.friends || null : null;
-          dispatch(this.update(usr, msg, todos, friends));
+          const account = (userPrivateData) ? userPrivateData.account || 'free' : null;
+          dispatch(this.update(usr, msg, todos, friends, account));
           dispatch(data.received(DNODE.USER));
           resolve(user);
         });
@@ -264,12 +275,13 @@ export const user = {
     }
   },
 
-  update(usr, msg, todos, friends) {
+  update(usr, msg, todos, friends, account) {
     return dispatch => {
       dispatch(this.auth.update(usr));
       dispatch(this.messages.update(msg));
       dispatch(this.todos.update(todos));
       dispatch(this.friends.update(friends));
+      dispatch(this.account.update(account));
     }
   }
 

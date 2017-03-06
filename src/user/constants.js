@@ -18,6 +18,9 @@ export const USER = {
   FRIENDS       : {
     UPDATE      : 'user.friends.update'
   },
+  ACCOUNT       : {
+    UPDATE      : 'user.account.update'
+  },
   
   /* asynchronous actions */
   SIGNUP        : 'user.signup',

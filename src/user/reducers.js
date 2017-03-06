@@ -55,9 +55,23 @@ function todos (state = {}, action) {
   }
 }
 
+function account (state = {}, action) {
+
+  switch (action.type) {
+
+    case USER.ACCOUNT.UPDATE :
+      return action.payload.account;
+
+    default :
+      return state;
+
+  }
+}
+
 export const user = combineReducers({
   auth,
   messages,
   friends,
   todos,
+  account
 });
