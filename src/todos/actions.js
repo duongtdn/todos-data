@@ -306,7 +306,7 @@ export const todos = {
             // send a info message to use whom removed from the list
             const message = messages.template(TEMPLATE.UNSHARE).create({
               receivers : [id],
-              content   : `You are removed from share list of this task: ${todo.text}`,
+              content   : todo.text,
               todo      : todo.id
             });
             const msgKey = db.users.child(id).child('msg').push().key;
