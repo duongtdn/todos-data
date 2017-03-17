@@ -286,7 +286,6 @@ export const todos = {
 
   edit(todo) {
     return dispatch => {
-
       const uid = auth.currentUser.uid;
       if (!uid) {
         dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
@@ -300,10 +299,10 @@ export const todos = {
       const stakeholders = [];
       for (let id in todo.share) {
         const user = todo.share[id];
-        if (user !== uid) {
+        if (user.id !== uid) {
           stakeholders.push(user);
-          if (user === null) {
-            // send a info message to use whom removed from the list
+          if (user === null || /deleted/i.test(user.status)) {
+            // send a info message to user whom removed from the list
             const message = messages.template(TEMPLATE.UNSHARE).create({
               receivers : [id],
               content   : todo.text,
@@ -312,6 +311,13 @@ export const todos = {
             const msgKey = db.users.child(id).child('msg').push().key;
             message.id = msgKey;
             updates[`users/${id}/msg/${msgKey}`] = {...message};
+            // and recall invited message if any
+            const [status, msgId] = user.status.split('.');
+            if (msgId) {
+              updates[`users/${user.id}/msg/${msgId}`] = null;
+              // also, remove user in share list
+              todo.share[id] = null;
+            }
           } else if (user.status === 'invited') {
             // send confirm message to whom invited
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
