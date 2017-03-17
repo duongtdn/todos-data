@@ -299,37 +299,39 @@ export const todos = {
       const stakeholders = [];
       for (let id in todo.share) {
         const user = todo.share[id];
-        if (user.id !== uid) {
-          stakeholders.push(user);
-          if (user === null || /deleted/i.test(user.status)) {
-            // send a info message to user whom removed from the list
-            const message = messages.template(TEMPLATE.UNSHARE).create({
-              receivers : [id],
-              content   : todo.text,
-              todo      : todo.id
-            });
-            const msgKey = db.users.child(id).child('msg').push().key;
-            message.id = msgKey;
-            updates[`users/${id}/msg/${msgKey}`] = {...message};
-            // and recall invited message if any
-            const [status, msgId] = user.status.split('.');
-            if (msgId) {
-              updates[`users/${user.id}/msg/${msgId}`] = null;
-              // also, remove user in share list
-              todo.share[id] = null;
-            }
-          } else if (user.status === 'invited') {
-            // send confirm message to whom invited
-            const message = messages.template(TEMPLATE.INVITE_TODO).create({
-              receivers : [user.id],
-              content   : todo.text,
-              todo      : todo.id
-            });
-            const msgKey = db.users.child(user.id).child('msg').push().key;
-            message.id = msgKey;
-            user.status = `invited.${msgKey}`;
-            updates[`users/${user.id}/msg/${msgKey}`] = {...message};
+        console.log(user)
+        if (user && user.id === uid) {
+          continue;
+        }
+        stakeholders.push(user);
+        if (user && /deleted/i.test(user.status)) {
+          // send a info message to user whom removed from the list
+          const message = messages.template(TEMPLATE.UNSHARE).create({
+            receivers : [id],
+            content   : todo.text,
+            todo      : todo.id
+          });
+          const msgKey = db.users.child(id).child('msg').push().key;
+          message.id = msgKey;
+          updates[`users/${id}/msg/${msgKey}`] = {...message};
+          // and recall invited message if any
+          const [status, msgId] = user.status.split('.');
+          if (msgId) {
+            updates[`users/${user.id}/msg/${msgId}`] = null;
+            // also, remove user in share list
+            todo.share[id] = null;
           }
+        } else if (user && user.status === 'invited') {
+          // send confirm message to whom invited
+          const message = messages.template(TEMPLATE.INVITE_TODO).create({
+            receivers : [user.id],
+            content   : todo.text,
+            todo      : todo.id
+          });
+          const msgKey = db.users.child(user.id).child('msg').push().key;
+          message.id = msgKey;
+          user.status = `invited.${msgKey}`;
+          updates[`users/${user.id}/msg/${msgKey}`] = {...message};
         }
       }
 
