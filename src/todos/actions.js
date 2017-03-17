@@ -298,12 +298,13 @@ export const todos = {
       const updates = {};
       const stakeholders = [];
       for (let id in todo.share) {
-        const user = todo.share[id];
+        const user = {...todo.share[id]};
         if (user && user.id === uid) {
           continue;
         }
         stakeholders.push(user);
-        if (user && /deleted/i.test(user.status)) {
+
+        if (user && user.status === 'unshared') {
           // send a info message to user whom removed from the list
           const message = messages.template(TEMPLATE.UNSHARE).create({
             receivers : [id],
@@ -313,6 +314,12 @@ export const todos = {
           const msgKey = db.users.child(id).child('msg').push().key;
           message.id = msgKey;
           updates[`users/${id}/msg/${msgKey}`] = {...message};
+
+          // also, remove user in share list
+          todo.share[id] = null;
+        }
+
+        if (user && /recall/i.test(user.status)) {          
           // and recall invited message if any
           const [status, msgId] = user.status.split('.');
           if (msgId) {
@@ -320,7 +327,9 @@ export const todos = {
             // also, remove user in share list
             todo.share[id] = null;
           }
-        } else if (user && user.status === 'invited') {
+        }
+        
+        if (user && user.status === 'invited') {
           // send confirm message to whom invited
           const message = messages.template(TEMPLATE.INVITE_TODO).create({
             receivers : [user.id],
@@ -329,7 +338,7 @@ export const todos = {
           });
           const msgKey = db.users.child(user.id).child('msg').push().key;
           message.id = msgKey;
-          user.status = `invited.${msgKey}`;
+          todo.share[id].status = `invited.${msgKey}`;
           updates[`users/${user.id}/msg/${msgKey}`] = {...message};
         }
       }
