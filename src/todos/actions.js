@@ -299,7 +299,6 @@ export const todos = {
       const stakeholders = [];
       for (let id in todo.share) {
         const user = todo.share[id];
-        console.log(user)
         if (user && user.id === uid) {
           continue;
         }
