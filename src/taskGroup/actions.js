@@ -25,7 +25,7 @@ export const taskGroup = {
 
   /* asynchronous actions */
 
-  create({name = '', members = []}) {
+  create({name = '', members = [], color = ''}) {
 
     return dispatch => {
 
@@ -71,7 +71,9 @@ export const taskGroup = {
         updates[`group/${taskGroupId}`] = {
           id : taskGroupId,
           name : name,
-          members : stakeholders
+          members : stakeholders,
+          color : color,
+          createdAt : timestamp
         }
 
         // update
