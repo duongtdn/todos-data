@@ -299,22 +299,19 @@ export const todos = {
       const stakeholders = [];
       for (let id in todo.share) {
         const user = {...todo.share[id]};
-        if (user && user.id === uid) {
-          continue;
-        }
-        stakeholders.push(user);
 
         if (user && user.status === 'unshared') {
-          // send a info message to user whom removed from the list
-          const message = messages.template(TEMPLATE.UNSHARE).create({
-            receivers : [id],
-            content   : todo.text,
-            todo      : todo.id
-          });
-          const msgKey = db.users.child(id).child('msg').push().key;
-          message.id = msgKey;
-          updates[`users/${id}/msg/${msgKey}`] = {...message};
-
+          if (user.id !== uid) {
+            // send a info message to user whom removed from the list
+            const message = messages.template(TEMPLATE.UNSHARE).create({
+              receivers : [id],
+              content   : todo.text,
+              todo      : todo.id
+            });
+            const msgKey = db.users.child(id).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${id}/msg/${msgKey}`] = {...message};
+          }
           // also, remove user in share list
           todo.share[id] = null;
         }
