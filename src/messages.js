@@ -10,6 +10,7 @@ export const TEMPLATE = {
   DELETE_TODO    : 'deleteTodo',
   CHANGE_TODO    : 'changeTodo',
   UNDO_COMPLETED : 'undoCompleted',
+  UNSHARE        : 'unshareTodo',
   INVITE_GROUP   : 'inviteGroup'
 };
 
