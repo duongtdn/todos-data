@@ -9,7 +9,8 @@ export const TEMPLATE = {
   COMPLETE_TODO  : 'completeTodo',
   DELETE_TODO    : 'deleteTodo',
   CHANGE_TODO    : 'changeTodo',
-  UNDO_COMPLETED : 'undoCompleted'
+  UNDO_COMPLETED : 'undoCompleted',
+  INVITE_GROUP   : 'inviteGroup'
 };
 
 export const MESSAGES = {
@@ -26,7 +27,8 @@ export const MESSAGES = {
     TODO_COMPLETED      : 'todo.completed',
     TODO_DELETED        : 'todo.deleted',
     TODO_UNDO_COMPLETED : 'todo.undoCompleted',
-    UNSHARE             : 'todo.unshare'
+    UNSHARE             : 'todo.unshare',
+    INVITE_GROUP        : 'taskGroup.invite'
   },
   CATEGORY  : {
     SYSTEM          : 'system',
@@ -46,7 +48,8 @@ export default {
     category  : '',
     subject   : '',
     content   : '',
-    todo      : ''
+    todo      : '',
+    taskGroup : ''
   },
   
   template(name) {
@@ -100,7 +103,13 @@ export default {
 
         return this;
 
-      
+      case TEMPLATE.INVITE_GROUP :
+        this.msgStruct.type = MESSAGES.TYPE.CONFIRM;
+        this.msgStruct.category = MESSAGES.CATEGORY.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.INVITE_GROUP;
+        return this;
+
+
 
       default :
         return this;
@@ -109,7 +118,7 @@ export default {
   },
 
 
-  create ({receivers = null, type = null, subject = null, content = null, todo = null}) {
+  create ({receivers = null, type = null, subject = null, content = null, todo = null, taskGroup = null}) {
     
     const uid = auth.currentUser.uid;
     this.msgStruct.status = MESSAGES.STATUS.UNREAD;
@@ -131,6 +140,10 @@ export default {
     if (todo) {
       this.msgStruct.todo = todo;
     }
+    if (taskGroup) {
+      this.msgStruct.taskGroup = taskGroup;
+    }
+
     return this.msgStruct;
   },
 

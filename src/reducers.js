@@ -10,6 +10,7 @@ import { filter } from './filter/reducers'
 import { search } from './search/reducers'
 import { currentTodo } from './currentTodo/reducers'
 import { connection } from './connection/reducers'
+import { taskGroup } from './taskGroup/reducers'
 
 export default combineReducers({
   todos  : todos,
@@ -19,5 +20,6 @@ export default combineReducers({
   filter : filter,
   search : search,
   currentTodo : currentTodo,
-  connection : connection
+  connection : connection,
+  taskGroup : taskGroup
 })

@@ -8,6 +8,7 @@ db.root  = db.ref();
 db.todos = db.ref('todos');
 db.users = db.ref('users');
 db.usersList = db.ref('usersList');
+db.taskGroup = db.ref('group');
 
 /* extend utilities for db.todos */
 
