@@ -90,7 +90,6 @@ export const taskGroup = {
   },
 
   accept(message) {
-    console.log(message)
     return dispatch => {
       return new Promise((resolve, reject) => {
         const uid = auth.currentUser.uid;
@@ -101,12 +100,29 @@ export const taskGroup = {
           updates[`users/${uid}/group/${taskGroupId}`] = {role : 'member'};
           updates[`users/${uid}/msg/${message.id}`] = null;
         }
-        console.log(updates)
         // update
         return db.root.update(updates).then(() => {
           resolve();
         }).catch(err => reject(err));
       });
+    }
+  },
+
+  decline(message) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        const uid = auth.currentUser.uid;
+        const taskGroupId = message.taskGroup;
+        const updates = {};
+        if (taskGroupId) {
+          updates[`group/${taskGroupId}/members/${uid}`] = null;
+          updates[`users/${uid}/msg/${message.id}`] = null;
+        }
+        // update
+        return db.root.update(updates).then(() => {
+          resolve();
+        }).catch(err => reject(err));
+      })
     }
   },
 
