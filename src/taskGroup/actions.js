@@ -79,7 +79,7 @@ export const taskGroup = {
         }
 
         // also add to user task group list
-        updates[`users/${uid}/groups/${taskGroupId}`] = {role : 'owner'};
+        updates[`users/${uid}/groups/${taskGroupId}`] = {name : name, role : 'owner'};
         // update
         return db.root.update(updates).then(() => {
           resolve();
