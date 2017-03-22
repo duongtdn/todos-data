@@ -68,10 +68,24 @@ function account (state = {}, action) {
   }
 }
 
+function groups (state = {}, action) {
+
+  switch (action.type) {
+
+    case USER.GROUPS.UPDATE :
+      return action.payload.groups;
+
+    default :
+      return state;
+
+  }
+}
+
 export const user = combineReducers({
   auth,
   messages,
   friends,
   todos,
-  account
+  account,
+  groups
 });
