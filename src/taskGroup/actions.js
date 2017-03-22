@@ -91,7 +91,7 @@ export const taskGroup = {
 
   },
 
-  accept(message) {
+  accept(name, message) {
     return dispatch => {
       return new Promise((resolve, reject) => {
         const uid = auth.currentUser.uid;
@@ -99,7 +99,7 @@ export const taskGroup = {
         const updates = {};
         if (taskGroupId) {
           updates[`groups/${taskGroupId}/members/${uid}/status`] = 'accepted';
-          updates[`users/${uid}/groups/${taskGroupId}`] = {role : 'member'};
+          updates[`users/${uid}/groups/${taskGroupId}`] = {name, role : 'member'};
           updates[`users/${uid}/msg/${message.id}`] = null;
         }
         // update
