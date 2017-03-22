@@ -138,6 +138,16 @@ export const user = {
     },
   },
 
+  groups : {
+    /* synchronous actions */
+    update (groups) {
+      return {
+        type    : USER.GROUPS.UPDATE,
+        payload : { groups }
+      }
+    },
+  },
+
 
   /* asynchronous actions */
 
@@ -257,7 +267,8 @@ export const user = {
           const todos  = (userPrivateData) ? userPrivateData.todos || null : null;
           const friends = (userPrivateData) ? userPrivateData.friends || null : null;
           const account = (userPrivateData) ? userPrivateData.account || 'free' : null;
-          dispatch(this.update(usr, msg, todos, friends, account));
+          const groups = (userPrivateData) ? userPrivateData.groups || null : null;
+          dispatch(this.update(usr, msg, todos, friends, account, groups));
           dispatch(data.received(DNODE.USER));
           resolve(user);
         });
@@ -275,13 +286,14 @@ export const user = {
     }
   },
 
-  update(usr, msg, todos, friends, account) {
+  update(usr, msg, todos, friends, account, groups) {
     return dispatch => {
       dispatch(this.auth.update(usr));
       dispatch(this.messages.update(msg));
       dispatch(this.todos.update(todos));
       dispatch(this.friends.update(friends));
       dispatch(this.account.update(account));
+      dispatch(this.groups.update(groups));
     }
   }
 

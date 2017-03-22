@@ -70,7 +70,7 @@ export const taskGroup = {
         }
 
         const timestamp = getTime();
-        updates[`group/${taskGroupId}`] = {
+        updates[`groups/${taskGroupId}`] = {
           id : taskGroupId,
           name : name,
           members : stakeholders,
@@ -78,6 +78,8 @@ export const taskGroup = {
           createdAt : timestamp
         }
 
+        // also add to user task group list
+        updates[`users/${uid}/groups/${taskGroupId}`] = {role : 'owner'};
         // update
         return db.root.update(updates).then(() => {
           resolve();
@@ -96,8 +98,8 @@ export const taskGroup = {
         const taskGroupId = message.taskGroup;
         const updates = {};
         if (taskGroupId) {
-          updates[`group/${taskGroupId}/members/${uid}/status`] = 'accepted';
-          updates[`users/${uid}/group/${taskGroupId}`] = {role : 'member'};
+          updates[`groups/${taskGroupId}/members/${uid}/status`] = 'accepted';
+          updates[`users/${uid}/groups/${taskGroupId}`] = {role : 'member'};
           updates[`users/${uid}/msg/${message.id}`] = null;
         }
         // update
@@ -115,7 +117,7 @@ export const taskGroup = {
         const taskGroupId = message.taskGroup;
         const updates = {};
         if (taskGroupId) {
-          updates[`group/${taskGroupId}/members/${uid}`] = null;
+          updates[`groups/${taskGroupId}/members/${uid}`] = null;
           updates[`users/${uid}/msg/${message.id}`] = null;
         }
         // update

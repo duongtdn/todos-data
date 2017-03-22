@@ -21,6 +21,9 @@ export const USER = {
   ACCOUNT       : {
     UPDATE      : 'user.account.update'
   },
+  GROUPS       : {
+    UPDATE      : 'user.groups.update'
+  },
   
   /* asynchronous actions */
   SIGNUP        : 'user.signup',
