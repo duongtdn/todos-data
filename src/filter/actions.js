@@ -4,10 +4,10 @@ import { FILTER } from './constants'
 
 /* action creater */
 export const filter = {
-  apply({hideCompletion = false}) {
+  apply(group) {
     return {
       type    : FILTER.APPLY,
-      payload : { hideCompletion }
+      payload : group
     }
   }
 }
