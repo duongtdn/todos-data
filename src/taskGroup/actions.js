@@ -128,4 +128,21 @@ export const taskGroup = {
     }
   },
 
+  fetch() {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        db.users.getTaskGroupList(list => {
+          db.taskGroup.get(list, groups => {
+            if (groups) {
+              dispatch(taskGroup.update(groups));
+              resolve(groups);
+            } else {
+              reject();
+            }
+          });
+        });
+      });
+    }
+  },
+
 }

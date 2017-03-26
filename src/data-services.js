@@ -105,6 +105,71 @@ db.users.getTodosList = callback => {
   }
 }
 
+db.users.getTaskGroupList = callback => {
+  const user = fb.auth().currentUser;
+  if (user) {
+    db.users.child(user.uid).child('groups').on('value', snapshot => {
+      callback(snapshot.val());
+    });
+  } else {
+    callback(null);
+  }
+}
+
+
+db.taskGroup.get = (list, callback) => {
+  const done = [];
+  function _doneCheck() {
+    if (done.every( el => el)) { 
+      // remove deleted task group
+      if (invalidateTaskGroups.length > 0) {
+        const updates = {};
+        invalidateTaskGroups.forEach(groupId => {
+          updates[`users/${uid}/groups/${groupId}`] = null;
+          db.taskGroup.child(groupId).off('value');
+        })
+        db.root.update(updates);
+      } 
+      // return taskGroup through callback
+      callback(taskGroups);
+    }
+  }
+
+  const uid = fb.auth().currentUser && fb.auth().currentUser.uid;
+  if (!uid) {
+    return;
+  }
+
+  if (!list || list.length === 0) {
+    return;
+  }
+
+  const taskGroups = {};
+  const invalidateTaskGroups = [];
+  const n = Object.keys(list).length;
+  for (let i = 0; i < n; i++) {
+    done.push(false);
+  }
+
+  for (let i = 0; i < n; i++) {
+    const id = Object.keys(list)[i];
+    db.taskGroup.child(id).on('value', snap => {
+      const group = snap.val();
+      if (group) {
+        taskGroups[id] = group
+      } else {
+        db.taskGroup.child(id).off('value');
+      }
+      done[i] = true;
+      _doneCheck();
+    }, err => {
+      invalidateTaskGroups.push(id);
+      done[i] = true;
+      _doneCheck();
+    });
+  }
+
+}
 
 export default db;
 
