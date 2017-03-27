@@ -169,7 +169,6 @@ export const taskGroup = {
         const updates = {};
         // send invite message for inviting member
         const members = {...group.members};
-        console.log(members)
         for (let id in members) {
           const member = members[id];
           if (member && member.status === 'invited') {
