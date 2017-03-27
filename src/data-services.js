@@ -140,12 +140,14 @@ db.taskGroup.get = (list, callback) => {
     return;
   }
 
+  const taskGroups = {};
+  const invalidateTaskGroups = [];
+
   if (!list || list.length === 0) {
+    callback(taskGroups);
     return;
   }
 
-  const taskGroups = {};
-  const invalidateTaskGroups = [];
   const n = Object.keys(list).length;
   for (let i = 0; i < n; i++) {
     done.push(false);

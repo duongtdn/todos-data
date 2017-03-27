@@ -79,7 +79,7 @@ export const taskGroup = {
         }
 
         // also add to user task group list
-        updates[`users/${uid}/groups/${taskGroupId}`] = {name : name, role : 'owner'};
+        updates[`users/${uid}/groups/${taskGroupId}`] = {color : color, role : 'owner'};
         // update
         return db.root.update(updates).then(() => {
           resolve();
@@ -91,7 +91,7 @@ export const taskGroup = {
 
   },
 
-  accept(name, message) {
+  accept(color, message) {
     return dispatch => {
       return new Promise((resolve, reject) => {
         const uid = auth.currentUser.uid;
@@ -99,7 +99,7 @@ export const taskGroup = {
         const updates = {};
         if (taskGroupId) {
           updates[`groups/${taskGroupId}/members/${uid}/status`] = 'accepted';
-          updates[`users/${uid}/groups/${taskGroupId}`] = {name, role : 'member'};
+          updates[`users/${uid}/groups/${taskGroupId}`] = {color, role : 'member'};
           updates[`users/${uid}/msg/${message.id}`] = null;
         }
         // update
@@ -144,5 +144,87 @@ export const taskGroup = {
       });
     }
   },
+
+  edit(group) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        /* validate some requirement */
+        if (!auth.currentUser) {
+          reject('User is not signed in');
+        }
+
+        if (!group.id || group.id.length === 0) {
+          reject('This Task group does not exist');
+        }
+
+        if (group.name.length === 0) {
+          reject('Name is missing');
+        }
+
+        if (group.members.length === 0) {
+          reject('No members for this Task group');
+        }
+
+        const uid = auth.currentUser.uid;
+        const updates = {};
+        // send invite message for inviting member
+        const members = {...group.members};
+        console.log(members)
+        for (let id in members) {
+          const member = members[id];
+          if (member && member.status === 'invited') {
+            const message = messages.template(TEMPLATE.INVITE_GROUP).create({
+              receivers : [id],
+              content   : group.name,
+              taskGroup : group.id
+            });
+            const msgKey = db.users.child(id).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${id}/msg/${msgKey}`] = {...message};
+            member.status =  `invited.${msgKey}`;
+          } else if (member && member.status === 'unshared') {
+            if (id !== uid) {
+              // send a info message to user whom removed from the list
+              const message = messages.template(TEMPLATE.UNSHARE).create({
+                receivers : [id],
+                content   : group.name,
+                taskGroup : group.id
+              });
+              const msgKey = db.users.child(id).child('msg').push().key;
+              message.id = msgKey;
+              updates[`users/${id}/msg/${msgKey}`] = {...message};
+            }
+            // also, remove user in share list
+            members[id] = null;
+          } else if (member && /recall/i.test(member.status)) {
+            // and recall invited message if any
+            const [status, msgId] = member.status.split('.');
+            if (msgId) {
+              updates[`users/${id}/msg/${msgId}`] = null;
+              // also, remove user in share list
+              members[id] = null;
+            }
+          }
+          // we don't need to store member name
+          if (members[id]) { 
+            members[id].name = null;
+          }
+        }
+
+        for (let key in group) {
+          if (key === 'members') { continue }
+          updates[`groups/${group.id}/${key}`] = group[key];
+        }
+
+        updates[`groups/${group.id}/members`] = members;
+
+        // update
+        return db.root.update(updates).then(() => {
+          resolve();
+        }).catch(err => reject(err));
+
+      });
+    }
+  }
 
 }
