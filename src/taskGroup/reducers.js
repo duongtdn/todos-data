@@ -9,8 +9,10 @@ export function taskGroup (state = {}, action) {
   switch (action.type) {
 
     case TASKGROUP.UPDATE :
-      return action.payload.data;
-
+      return {...action.payload.data}; // because the taskGroups object is in 
+                                       // data-services db.taskGroup.get function
+                                       // is mutated, I need return new object
+                                       // to get mapStateToProps executed
     default :
       return state;
 
