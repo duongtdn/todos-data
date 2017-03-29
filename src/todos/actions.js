@@ -51,7 +51,7 @@ export const todos = {
       };
   },
 
-  add({text = '', share = {}, urgent = false, dueDate = ''}) {
+  add({text = '', share = {}, urgent = false, dueDate = '', group = null}) {
 
     return dispatch => {
       if (auth.currentUser) {
@@ -87,6 +87,15 @@ export const todos = {
           name : auth.currentUser.displayName,
           id : uid
         };
+
+
+        // get group
+        let taskGroup = null;
+        if (group && group.updated) {
+          taskGroup = group.updated;
+          updates[`groups/${taskGroup}/todos/${todoId}`] = true;
+        }
+
         const timestamp = getTime();
         updates[`todos/${todoId}`] = {
           id          : todoId,
@@ -97,7 +106,8 @@ export const todos = {
           completedBy : '',
           completedAt : '',
           urgent      : urgent,
-          dueDate     : dueDate
+          dueDate     : dueDate,
+          group       : taskGroup
         }
         // prepare todo in user list
         updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.LISTING, role : OWNER};
