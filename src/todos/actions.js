@@ -137,6 +137,12 @@ export const todos = {
         }
         
         updates[`users/${uid}/todos/${todo.id}`] = null;
+
+        // remove todo in its group as well
+        if (todo.group) {
+          updates[`groups/${todo.group}/todos/${todo.id}`] = null;
+        }
+
         // update
         _updateTodoAndUser (dispatch, updates);
       } else {
@@ -340,11 +346,34 @@ export const todos = {
         }
       }
 
+      // update group
+      if (todo.group) {
+
+        // remove group of this todo, if it has origin group as we've changed it 
+        // to new group or just has removed it
+        if (todo.group.origin) {
+          updates[`groups/${todo.group.origin}/todos/${todo.id}`] = null;
+        }
+
+        // update new group, if it is None we just simply set to null
+        if (todo.group.updated === '_0_') {
+          // then, simply remove this group
+          updates[`todos/${todo.id}/group`] = null
+        } else {
+          // add this todo to the group as well
+          updates[`groups/${todo.group.updated}/todos/${todo.id}`] = true;
+          updates[`todos/${todo.id}/group`] = todo.group.updated;
+        }
+      }
+
+
       for (let prop in todo) {
-        if (prop !== 'id' && prop !== 'createdAt') {
+        if (prop !== 'id' && prop !== 'createdAt' && prop !== 'group') {
           updates[`todos/${todo.id}/${prop}`] = todo[prop];
         }        
       }  
+
+      
 /*
       if (Object.keys(updates).length > 0) {
         // send message to stakeholders to notify change
