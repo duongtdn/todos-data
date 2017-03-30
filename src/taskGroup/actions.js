@@ -25,7 +25,7 @@ export const taskGroup = {
 
   /* asynchronous actions */
 
-  create({name = '', members = [], color = ''}) {
+  create({name = '', members = {}, color = ''}) {
 
     return dispatch => {
 
@@ -46,13 +46,15 @@ export const taskGroup = {
         const stakeholders = {};
 
         stakeholders[uid] = {
-          id : uid,
-          role : 'owner',
-          status : 'accepted'
+          id: uid,
+          role: 'owner',
+          name: auth.currentUser.email,
+          status: 'accepted'
         };
 
-        if (members.length > 0) {
-          members.forEach( userId => {
+        if (Object.keys(members).length > 0) {
+          for (let userId in members) {
+            const member = members[userId];
             const message = messages.template(TEMPLATE.INVITE_GROUP).create({
               receivers : [userId],
               content   : name,
@@ -63,10 +65,11 @@ export const taskGroup = {
             updates[`users/${userId}/msg/${msgKey}`] = {...message};
             stakeholders[userId] = {
               id : userId,
+              name : members[userId].name,
               role : 'member',
               status : `invited.${msgKey}`
             };
-          });
+          }
         }
 
         const timestamp = getTime();
@@ -203,10 +206,6 @@ export const taskGroup = {
               // also, remove user in share list
               members[id] = null;
             }
-          }
-          // we don't need to store member name
-          if (members[id]) { 
-            members[id].name = null;
           }
         }
 
