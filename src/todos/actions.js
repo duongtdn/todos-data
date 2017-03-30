@@ -369,13 +369,15 @@ export const todos = {
         }
 
         // update new group, if it is None we just simply set to null
-        if (todo.group.updated === '_0_') {
-          // then, simply remove this group
-          updates[`todos/${todo.id}/group`] = null
-        } else {
-          // add this todo to the group as well
-          updates[`groups/${todo.group.updated}/todos/${todo.id}`] = true;
-          updates[`todos/${todo.id}/group`] = todo.group.updated;
+        if (todo.group.updated) {
+          if (todo.group.updated === '_0_') {
+            // then, simply remove this group
+            updates[`todos/${todo.id}/group`] = null
+          } else {
+            // add this todo to the group as well
+            updates[`groups/${todo.group.updated}/todos/${todo.id}`] = true;
+            updates[`todos/${todo.id}/group`] = todo.group.updated;
+          }
         }
       }
 
