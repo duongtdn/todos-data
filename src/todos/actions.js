@@ -362,14 +362,14 @@ export const todos = {
       // update group
       if (todo.group) {
 
-        // remove group of this todo, if it has origin group as we've changed it 
-        // to new group or just has removed it
-        if (todo.group.origin) {
-          updates[`groups/${todo.group.origin}/todos/${todo.id}`] = null;
-        }
-
         // update new group, if it is None we just simply set to null
         if (todo.group.updated) {
+          // remove group of this todo, if it has origin group as we've changed it 
+          // to new group or just has removed it
+          if (todo.group.origin) {
+            updates[`groups/${todo.group.origin}/todos/${todo.id}`] = null;
+          }
+        
           if (todo.group.updated === '_0_') {
             // then, simply remove this group
             updates[`todos/${todo.id}/group`] = null
