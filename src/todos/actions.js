@@ -63,6 +63,7 @@ export const todos = {
         // prepare invitation messages
         if (share.length > 0) {
           share.forEach(user => {
+            if (user.id === uid) { return }
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
               content   : text,
@@ -84,7 +85,7 @@ export const todos = {
         stakeholders[uid] = {
           status : 'accepted',
           role : OWNER,
-          name : auth.currentUser.displayName,
+          name : auth.currentUser.email,
           id : uid
         };
 
@@ -301,6 +302,7 @@ export const todos = {
   },
 
   edit(todo) {
+    console.log(todo)
     return dispatch => {
       const uid = auth.currentUser.uid;
       if (!uid) {
@@ -314,6 +316,7 @@ export const todos = {
       const updates = {};
       const stakeholders = [];
       for (let id in todo.share) {
+        if (id === uid) { continue }
         const user = {...todo.share[id]};
 
         if (user && user.status === 'unshared') {
