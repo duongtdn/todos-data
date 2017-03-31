@@ -8,6 +8,7 @@ import { error } from '../error/actions'
 import { ECODE } from '../error/constants'
 import { USER } from './constants'
 import { MESSAGES} from '../messages'
+import { todos } from '../todos/actions'
 
 /* action creators */
 export const user = {
@@ -270,6 +271,7 @@ export const user = {
           const groups = (userPrivateData) ? userPrivateData.groups || null : null;
           dispatch(this.update(usr, msg, todos, friends, account, groups));
           dispatch(data.received(DNODE.USER));
+          _autoAcceptMessage(dispatch, msg, groups)
           resolve(user);
         });
       });       
@@ -304,4 +306,20 @@ function _updateUserNode(dispatch, updates) {
   db.root.update(updates).then( () => {
     dispatch(data.uploaded(DNODE.USER));
   });
+}
+
+function _autoAcceptMessage(dispatch, messages, groups) {
+  const uid = auth.currentUser.uid;
+  for (let id in messages) {   
+    const msg = messages[id];
+    if (msg.subject !== 'todo.share') {
+      continue;
+    }
+    if (msg.taskGroup.length === 0) {
+      continue;
+    }
+    if (groups[msg.taskGroup]) {
+      dispatch(todos.accept(msg));
+    }
+  }
 }

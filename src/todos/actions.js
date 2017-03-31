@@ -67,7 +67,8 @@ export const todos = {
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
               content   : text,
-              todo      : todoId
+              todo      : todoId,
+              taskGroup : group && group.updated && group.updated !== '_0_' ? group.updated : '',
             });
             const msgKey = db.users.child(user.id).child('msg').push().key;
             message.id = msgKey;
@@ -325,7 +326,8 @@ export const todos = {
             const message = messages.template(TEMPLATE.UNSHARE).create({
               receivers : [id],
               content   : todo.text,
-              todo      : todo.id
+              todo      : todo.id,
+              taskGroup : todo.group && todo.group.updated && todo.group.updated !== '_0_' ? todo.group.updated : '',
             });
             const msgKey = db.users.child(id).child('msg').push().key;
             message.id = msgKey;
