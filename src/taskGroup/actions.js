@@ -174,7 +174,7 @@ export const taskGroup = {
         // send invite message for inviting member
         const members = {...group.members};
         for (let id in members) {
-          if (userId === uid) { continue }
+          if (id === uid) { continue }
           const member = members[id];
           if (member && member.status === 'invited') {
             const message = messages.template(TEMPLATE.INVITE_GROUP).create({
