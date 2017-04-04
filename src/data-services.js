@@ -127,6 +127,7 @@ db.taskGroup.get = (list, callback) => {
         invalidateTaskGroups.forEach(groupId => {
           updates[`users/${uid}/groups/${groupId}`] = null;
           db.taskGroup.child(groupId).off('value');
+          delete taskGroups[groupId];
         })
         db.root.update(updates);
       } 
@@ -161,6 +162,7 @@ db.taskGroup.get = (list, callback) => {
         taskGroups[id] = group
       } else {
         db.taskGroup.child(id).off('value');
+        delete taskGroups[id];
       }
       done[i] = true;
       _doneCheck();
