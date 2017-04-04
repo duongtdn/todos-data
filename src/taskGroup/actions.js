@@ -225,6 +225,56 @@ export const taskGroup = {
 
       });
     }
+  },
+
+  delete(group) {
+    return dispatch => {
+      return new Promise((resolve, reject) => {
+        /* validate some requirement */
+        if (!auth.currentUser) {
+          reject('User is not signed in');
+        }
+        if (!group || !group.id || group.id === '_0_') {
+          reject('No Task Group');
+        }
+
+        const uid = auth.currentUser.uid;
+        const updates = {};
+        const stakeholders = [];
+
+        // get a list of invited user, then recall all invited mesages
+        for (let id in group.members) {
+          const user = group.members[id];
+          if ((/invited/i).test(user.status)) {
+            stakeholders.push(user);
+          }
+        }
+
+        if (stakeholders.length > 0) {
+          stakeholders.forEach(user => {
+            const [status, msgId] = user.status.split('.');
+            updates[`users/${user.id}/msg/${msgId}`] = null;
+          });
+        }
+
+        // delete group in db and user list
+        updates[`groups/${group.id}`] = null;
+        updates[`users/${uid}/groups/${group.id}`] = null;
+
+        // set all todos under this group as no group
+        if (group.todos) {
+          for (let id in group.todos) {
+            updates[`todos/${id}/group`] = null;
+          }
+        }
+        
+        // update
+        return db.root.update(updates).then(() => {
+          resolve();
+        }).catch(err => reject(err));
+
+      });
+    }
   }
 
 }
