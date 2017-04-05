@@ -93,7 +93,7 @@ export const todos = {
 
         // get group
         let taskGroup = null;
-        if (group && group.updated) {
+        if (group && group.updated && group.updated !== '_0_') {
           taskGroup = group.updated;
           updates[`groups/${taskGroup}/todos/${todoId}`] = true;
         }
