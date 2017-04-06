@@ -303,7 +303,6 @@ export const todos = {
   },
 
   edit(todo) {
-    console.log(todo)
     return dispatch => {
       const uid = auth.currentUser.uid;
       if (!uid) {
