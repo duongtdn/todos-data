@@ -6,7 +6,9 @@
   "author": "duongtdn",
   "license": "MIT",
   "scripts": {
-    "build": "babel src -d lib",
+    "clean": "rm -rf lib",
+    "babel": "babel src -d lib",
+    "build": "npm run clean && npm run babel",
     "prepublish": "npm run build",
     "compile": "npm run build && browserify lib/ -o bundle.js"
   },
