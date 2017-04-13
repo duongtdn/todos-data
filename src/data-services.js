@@ -125,9 +125,12 @@ db.taskGroup.get = (list, callback) => {
       if (invalidateTaskGroups.length > 0) {
         const updates = {};
         invalidateTaskGroups.forEach(groupId => {
-          updates[`users/${uid}/groups/${groupId}`] = null;
-          db.taskGroup.child(groupId).off('value');
-          delete taskGroups[groupId];
+          if (fb.auth().currentUser) {
+            const uid = fb.auth().currentUser.uid;
+            updates[`users/${uid}/groups/${groupId}`] = null;
+            db.taskGroup.child(groupId).off('value');
+            delete taskGroups[groupId];
+          }
         })
         db.root.update(updates);
       } 
