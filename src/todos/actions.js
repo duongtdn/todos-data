@@ -128,39 +128,47 @@ export const todos = {
   delete(todo) {
     return dispatch => {
       if (auth.currentUser) {
-        
-        const uid = auth.currentUser.uid;
         const updates = {};
-        const stakeholders = [];
-        // delete todo in todos at root and users, then recall all invited mesages
-        // need a change in the way invited messages are sent, eg. invited.msgId
-        for (let id in todo.share) {
-          const user = todo.share[id];
-          if ((/invited/i).test(user.status)) {
-            stakeholders.push(user);
-          }
-        }
-        updates[`todos/${todo.id}`] = null; 
-        if (stakeholders.length > 0) {
-          stakeholders.forEach(user => {
-            const [status, msgId] = user.status.split('.');
-            updates[`users/${user.id}/msg/${msgId}`] = null;
-          });
-        }
-        
-        updates[`users/${uid}/todos/${todo.id}`] = null;
-
-        // remove todo in its group as well
-        if (todo.group) {
-          updates[`groups/${todo.group}/todos/${todo.id}`] = null;
-        }
-
+        if (Object.prototype.toString.call(todo) === '[object Array]' ) {
+          todo.forEach( t => this._delete(t, updates));
+        } else {
+          this._delete(todo,updates);
+        }       
         // update
         _updateTodoAndUser (dispatch, updates);
       } else {
         dispatch(error.update(ECODE.NOT_AUTHEN, {message : 'user is not signed in'}));
       }
     }
+  },
+
+  _delete(todo, updates) {
+    const uid = auth.currentUser.uid;
+    
+    const stakeholders = [];
+    // delete todo in todos at root and users, then recall all invited mesages
+    // need a change in the way invited messages are sent, eg. invited.msgId
+    for (let id in todo.share) {
+      const user = todo.share[id];
+      if ((/invited/i).test(user.status)) {
+        stakeholders.push(user);
+      }
+    }
+    updates[`todos/${todo.id}`] = null; 
+    if (stakeholders.length > 0) {
+      stakeholders.forEach(user => {
+        const [status, msgId] = user.status.split('.');
+        updates[`users/${user.id}/msg/${msgId}`] = null;
+      });
+    }
+    
+    updates[`users/${uid}/todos/${todo.id}`] = null;
+
+    // remove todo in its group as well
+    if (todo.group) {
+      updates[`groups/${todo.group}/todos/${todo.id}`] = null;
+    }
+
   },
 
   complete(todo) {
