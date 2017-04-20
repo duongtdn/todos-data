@@ -129,19 +129,19 @@ export default {
     if (receivers) {
       this.msgStruct.to = [...receivers];
     }
-    if (type) {
+    if (type !== null) {
       this.msgStruct.type = type;
     }
-    if (subject) {
+    if (subject !== null) {
       this.msgStruct.subject = subject;
     }
-    if (content) {
+    if (content !== null) {
       this.msgStruct.content = content;
     }
-    if (todo) {
+    if (todo !== null) {
       this.msgStruct.todo = todo;
     }
-    if (taskGroup) {
+    if (taskGroup !== null) {
       this.msgStruct.taskGroup = taskGroup;
     }
 
