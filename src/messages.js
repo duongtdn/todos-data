@@ -54,6 +54,9 @@ export default {
   },
   
   template(name) {
+    /* clean message struct before create new */
+    this._clear();
+    
     switch (name) {
       
       case TEMPLATE.INVITE_TODO :
@@ -151,14 +154,17 @@ export default {
 
   _clear() {
     this.msgStruct = {
+      id        : '',
       status    : '',
       from      : '',
       to        : [],
       createdAt : null,
       type      : '',
+      category  : '',
       subject   : '',
       content   : '',
-      todo      : ''
+      todo      : '',
+      taskGroup : ''
     };
     return this;
   },
