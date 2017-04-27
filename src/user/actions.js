@@ -318,7 +318,7 @@ function _autoAcceptMessage(dispatch, messages, groups) {
     if (msg.taskGroup.length === 0) {
       continue;
     }
-    if (groups[msg.taskGroup]) {
+    if (groups && groups[msg.taskGroup]) {
       dispatch(todos.accept(msg));
     }
   }
