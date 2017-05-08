@@ -11,7 +11,7 @@ import { MESSAGES} from '../messages'
 import { todos } from '../todos/actions'
 
 const DEFAULT_ACCOUNT = {
-  type: 'pro',
+  type: 'free',
   props: {
     noLimit: true
   }
