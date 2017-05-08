@@ -10,6 +10,13 @@ import { USER } from './constants'
 import { MESSAGES} from '../messages'
 import { todos } from '../todos/actions'
 
+const DEFAULT_ACCOUNT = {
+  type: 'pro',
+  props: {
+    noLimit: true
+  }
+};
+
 /* action creators */
 export const user = {
 
@@ -170,12 +177,17 @@ export const user = {
             if (!name) { name = email; }
             const lowerCaseName = name.toLowerCase().trim().replace(/ +/g,' ');
             const id = user.uid;
-            db.root.child('usersList').child(user.uid).set({ id, email, name, lowerCaseName });
+            /* generate account type when signup in client code exposed a weak point
+               however, it's a limit of firebase as we have no server code */
+            db.users.child(user.uid).set({ account : DEFAULT_ACCOUNT });
+
+            db.root.child('usersList').child(user.uid).set({ id, email, name, lowerCaseName });           
+            user.updateProfile({ displayName : name }).then(() => resolve(user)); 
+
             // successful signed up, clear error flag if any 
             dispatch(error.clear(ECODE.INVALID_EMAIL));
             dispatch(error.clear(ECODE.INVALID_PASSWORD));
             dispatch(error.clear(ECODE.SIGNUP));
-            user.updateProfile({ displayName : name }).then(() => resolve(user)); 
           })
           .catch( err => {
             dispatch(error.update(ECODE.SIGNUP, err));
@@ -267,7 +279,7 @@ export const user = {
           const msg    = (userPrivateData) ? userPrivateData.msg || null : null;
           const todos  = (userPrivateData) ? userPrivateData.todos || null : null;
           const friends = (userPrivateData) ? userPrivateData.friends || null : null;
-          const account = (userPrivateData) ? userPrivateData.account || 'free' : null;
+          const account = (userPrivateData) ? userPrivateData.account || DEFAULT_ACCOUNT : null;
           const groups = (userPrivateData) ? userPrivateData.groups || null : null;
           dispatch(this.update(usr, msg, todos, friends, account, groups));
           dispatch(data.received(DNODE.USER));
