@@ -3,12 +3,13 @@
 import firebase from 'firebase';
 
 // Initialize Firebase
-const config = {
-  apiKey            : "AIzaSyDT4ogvYCFdgv8lohigvNXDG3QVSpRRIwI",
-  authDomain        : "awesome-9f422.firebaseapp.com",
-  databaseURL       : "https://awesome-9f422.firebaseio.com",
-  storageBucket     : "awesome-9f422.appspot.com",
-  messagingSenderId : "355266543315"
+var config = {
+  apiKey: "AIzaSyCrT408W7FS9Sx4iRCoVxllJTG8e6QhPuI",
+  authDomain: "todotogether-9ef1d.firebaseapp.com",
+  databaseURL: "https://todotogether-9ef1d.firebaseio.com",
+  projectId: "todotogether-9ef1d",
+  storageBucket: "todotogether-9ef1d.appspot.com",
+  messagingSenderId: "890607334661"
 };
 
 export const fb = firebase.initializeApp(config);
