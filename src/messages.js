@@ -126,7 +126,7 @@ export default {
     
     const uid = auth.currentUser.uid;
     this.msgStruct.status = MESSAGES.STATUS.UNREAD;
-    this.msgStruct.from = {id :uid, name : auth.currentUser.displayName};
+    this.msgStruct.from = {id: uid, name: auth.currentUser.displayName, email: auth.currentUser.email.toLowerCase()};
     this.msgStruct.createdAt = getTime();
     // need to validate to makesure receiver list is array 
     if (receivers) {
