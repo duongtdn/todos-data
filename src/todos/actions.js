@@ -323,6 +323,14 @@ export const todos = {
       }
       const updates = {};
       const stakeholders = [];
+      let group = ''; 
+      if (todo.group) {
+        if (todo.group.updated) {
+          group = todo.group.updated !== '_0_' ? todo.group.updated  : '';
+        } else if (todo.group.origin) {
+          group = todo.group.origin !== '_0_' ? todo.group.origin  : '';
+        }
+      }                 
       for (let id in todo.share) {
         if (id === uid) { continue }
         const user = {...todo.share[id]};
@@ -334,7 +342,7 @@ export const todos = {
               receivers : [id],
               content   : todo.text,
               todo      : todo.id,
-              taskGroup : todo.group && todo.group.updated && todo.group.updated !== '_0_' ? todo.group.updated : '',
+              taskGroup : group,
             });
             const msgKey = db.users.child(id).child('msg').push().key;
             message.id = msgKey;
@@ -359,7 +367,8 @@ export const todos = {
           const message = messages.template(TEMPLATE.INVITE_TODO).create({
             receivers : [user.id],
             content   : todo.text,
-            todo      : todo.id
+            todo      : todo.id,
+            taskGroup : group,
           });
           const msgKey = db.users.child(user.id).child('msg').push().key;
           message.id = msgKey;
