@@ -158,14 +158,18 @@ export const todos = {
     
     if (todo.share[uid].role === 'owner') {
       const stakeholders = [];
+      const receivers = [];
       // delete todo in todos at root and users, then recall all invited mesages
       // need a change in the way invited messages are sent, eg. invited.msgId
 
       // find all invited
       for (let id in todo.share) {
+        if (id === uid) { continue; }
         const user = todo.share[id];
         if ((/invited/i).test(user.status)) {
           stakeholders.push(user);
+        } else {
+          receivers.push(user);
         }
       }
       // and then recall messages
@@ -173,6 +177,19 @@ export const todos = {
         stakeholders.forEach(user => {
           const [status, msgId] = user.status.split('.');
           updates[`users/${user.id}/msg/${msgId}`] = null;
+        });
+      }
+      // and notify accepted users
+      if (todo.status !== 'completed') {
+        receivers.forEach(user => {
+          const message = messages.template(TEMPLATE.DELETE_TODO).create({
+            receivers : [user.id],
+            content   : todo.text,
+            todo : todo.id
+          });
+          const msgKey = db.users.child(user.id).child('msg').push().key;
+          message.id = msgKey;
+          updates[`users/${user.id}/msg/${msgKey}`] = {...message};
         });
       }
       // delete in the root db
