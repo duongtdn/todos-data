@@ -153,6 +153,8 @@ export const todos = {
     if (todo.share[uid] === undefined || todo.share[uid] === null) {
       return;
     }
+
+    // find owner
     
     if (todo.share[uid].role === 'owner') {
       const stakeholders = [];
@@ -182,6 +184,20 @@ export const todos = {
     } else {
       // for not owner, simply remove himself/herself from the share list
       updates[`todos/${todo.id}/share/${uid}`] = null;
+      // also notify others if todo is not completed
+      if (todo.status !== 'completed') {
+        for (let id in todo.share) {
+          if (id === uid) { continue; }
+          const message = messages.template(TEMPLATE.LEFT).create({
+            receivers : [id],
+            content   : todo.text,
+            todo : todo.id
+          });
+          const msgKey = db.users.child(id).child('msg').push().key;
+          message.id = msgKey;
+          updates[`users/${id}/msg/${msgKey}`] = {...message};
+        }      
+      }
     }
     
     // finally, remove todo from the own list
