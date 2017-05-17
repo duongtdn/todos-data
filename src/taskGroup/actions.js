@@ -174,7 +174,6 @@ export const taskGroup = {
         // send invite message for inviting member
         const members = {...group.members};
         for (let id in members) {
-          if (id === uid) { continue }
           const member = members[id];
           if (member && member.status === 'invited') {
             const message = messages.template(TEMPLATE.INVITE_GROUP).create({
@@ -197,6 +196,9 @@ export const taskGroup = {
               const msgKey = db.users.child(id).child('msg').push().key;
               message.id = msgKey;
               updates[`users/${id}/msg/${msgKey}`] = {...message};
+            } else {
+              // send a message notifying the onwer that you has left group
+
             }
             // also, remove user in share list
             members[id] = null;
