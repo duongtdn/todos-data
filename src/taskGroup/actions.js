@@ -173,6 +173,13 @@ export const taskGroup = {
         const updates = {};
         // send invite message for inviting member
         const members = {...group.members};
+        let owner = null;
+        for (let id in members) {
+          const usr = members[id];
+          if (usr.role === 'owner') {
+            owner = usr.id;
+          }
+        }
         for (let id in members) {
           const member = members[id];
           if (member && member.status === 'invited') {
@@ -198,7 +205,14 @@ export const taskGroup = {
               updates[`users/${id}/msg/${msgKey}`] = {...message};
             } else {
               // send a message notifying the onwer that you has left group
-
+              const message = messages.template(TEMPLATE.LEFT).create({
+                receivers : [owner],
+                content   : group.name,
+                taskGroup : group.id
+              });
+              const msgKey = db.users.child(owner).child('msg').push().key;
+              message.id = msgKey;
+              updates[`users/${owner}/msg/${msgKey}`] = {...message};
             }
             // also, remove user in share list
             members[id] = null;

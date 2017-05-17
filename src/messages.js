@@ -28,7 +28,8 @@ export const MESSAGES = {
     TODO_COMPLETED      : 'todo.completed',
     TODO_DELETED        : 'todo.deleted',
     TODO_UNDO_COMPLETED : 'todo.undoCompleted',
-    UNSHARE             : 'todo.unshare',
+    UNSHARE             : 'unshare',
+    LEFT                : 'left',
     INVITE_GROUP        : 'taskGroup.invite'
   },
   CATEGORY  : {
@@ -104,6 +105,14 @@ export default {
         this.msgStruct.type = MESSAGES.TYPE.ALERT;
         this.msgStruct.category = MESSAGES.CATEGORY.NOTIFICATION;
         this.msgStruct.subject = MESSAGES.SUBJECT.UNSHARE;
+
+        return this;
+
+      case TEMPLATE.LEFT :
+
+        this.msgStruct.type = MESSAGES.TYPE.ALERT;
+        this.msgStruct.category = MESSAGES.CATEGORY.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.LEFT;
 
         return this;
 
