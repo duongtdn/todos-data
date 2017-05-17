@@ -142,33 +142,50 @@ export const todos = {
     }
   },
 
+  /* change behavior in May 2017
+     only owner can deleted message in db
+     for collaborators, simply unshare them from the list, and remove from their
+     own todo lists
+  */
   _delete(todo, updates) {
     const uid = auth.currentUser.uid;
+
+    if (todo.share[uid] === undefined || todo.share[uid] === null) {
+      return;
+    }
     
-    const stakeholders = [];
-    // delete todo in todos at root and users, then recall all invited mesages
-    // need a change in the way invited messages are sent, eg. invited.msgId
-    for (let id in todo.share) {
-      const user = todo.share[id];
-      if ((/invited/i).test(user.status)) {
-        stakeholders.push(user);
+    if (todo.share[uid].role === 'owner') {
+      const stakeholders = [];
+      // delete todo in todos at root and users, then recall all invited mesages
+      // need a change in the way invited messages are sent, eg. invited.msgId
+
+      // find all invited
+      for (let id in todo.share) {
+        const user = todo.share[id];
+        if ((/invited/i).test(user.status)) {
+          stakeholders.push(user);
+        }
       }
-    }
-    updates[`todos/${todo.id}`] = null; 
-    if (stakeholders.length > 0) {
-      stakeholders.forEach(user => {
-        const [status, msgId] = user.status.split('.');
-        updates[`users/${user.id}/msg/${msgId}`] = null;
-      });
+      // and then recall messages
+      if (stakeholders.length > 0) {
+        stakeholders.forEach(user => {
+          const [status, msgId] = user.status.split('.');
+          updates[`users/${user.id}/msg/${msgId}`] = null;
+        });
+      }
+      // delete in the root db
+      updates[`todos/${todo.id}`] = null; 
+      // and, remove todo in its group as well
+      if (todo.group) {
+        updates[`groups/${todo.group}/todos/${todo.id}`] = null;
+      }
+    } else {
+      // for not owner, simply remove himself/herself from the share list
+      updates[`todos/${todo.id}/share/${uid}`] = null;
     }
     
+    // finally, remove todo from the own list
     updates[`users/${uid}/todos/${todo.id}`] = null;
-
-    // remove todo in its group as well
-    if (todo.group) {
-      updates[`groups/${todo.group}/todos/${todo.id}`] = null;
-    }
-
   },
 
   complete(todo) {

@@ -17,9 +17,11 @@ db.todos.lists = {};
 
 db.todos.get = (list, callback) => {
   const done = [];
+  db.todos.lists = {};      // reset to fix issue of deleted todo is maintain locally
+  db.todos.todosList = {}; // make it global and reset at beginning to avoid locally out dated
   function _doneCheck() {
     if (done.every( el => el)) {
-      callback(todosList);
+      callback(db.todos.todosList);
       // remove invalidated todos, this will cause the callback re-run --> need to optimize it
       if (invalidateTodos.length > 0) {
         const updates = {};
@@ -40,9 +42,8 @@ db.todos.get = (list, callback) => {
   if (!uid) {
     return;
   }
-  const todosList = {};
   const invalidateTodos = [];
-  if (list) {
+  if (list) { 
     const n = Object.keys(list).length;
     for (let i = 0; i < n; i++) {
       done.push(false);
@@ -55,7 +56,7 @@ db.todos.get = (list, callback) => {
       db.todos.lists[id].on('value', snap => {
         const todo = snap.val();
         if (todo) {
-          todosList[id] = todo;  
+          db.todos.todosList[id] = todo;  
         } else {
           // incase this todo is removed
           db.todos.lists[id].off('value');
@@ -75,7 +76,7 @@ db.todos.get = (list, callback) => {
       });
     }
   } else {
-    callback(todosList);
+    callback(db.todos.todosList);
   }
   
 }
