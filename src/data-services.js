@@ -59,8 +59,9 @@ db.todos.get = (list, callback) => {
           db.todos.todosList[id] = todo;  
         } else {
           // incase this todo is removed
-          db.todos.lists[id].off('value');
-          delete db.todos.lists[id];
+          // db.todos.lists[id].off('value');
+          // delete db.todos.lists[id];
+          invalidateTodos.push(id);
         }
 
         done[i] = true;

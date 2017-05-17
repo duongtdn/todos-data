@@ -194,7 +194,7 @@ export const taskGroup = {
             member.status =  `invited.${msgKey}`;
           } else if (member && member.status === 'unshared') {
             if (id !== uid) {
-              // send a info message to user whom removed from the list
+              // send an info message to user whom removed from the list
               const message = messages.template(TEMPLATE.UNSHARE).create({
                 receivers : [id],
                 content   : group.name,
@@ -277,10 +277,10 @@ export const taskGroup = {
         updates[`groups/${group.id}`] = null;
         updates[`users/${uid}/groups/${group.id}`] = null;
 
-        // set all todos under this group as no group
+        // changed: delete all todos under this group
         if (group.todos) {
           for (let id in group.todos) {
-            updates[`todos/${id}/group`] = null;
+            updates[`todos/${id}`] = null;
           }
         }
         
