@@ -11,7 +11,9 @@ export const TEMPLATE = {
   CHANGE_TODO    : 'changeTodo',
   UNDO_COMPLETED : 'undoCompleted',
   UNSHARE        : 'unshareTodo',
-  INVITE_GROUP   : 'inviteGroup'
+  LEFT           : 'left',
+  INVITE_GROUP   : 'inviteGroup',
+  DELETE_GROUP   : 'deleteGroup'
 };
 
 export const MESSAGES = {
@@ -30,7 +32,8 @@ export const MESSAGES = {
     TODO_UNDO_COMPLETED : 'todo.undoCompleted',
     UNSHARE             : 'unshare',
     LEFT                : 'left',
-    INVITE_GROUP        : 'taskGroup.invite'
+    INVITE_GROUP        : 'taskGroup.invite',
+    DELETE_GROUP        : 'taskGroup.deleted',
   },
   CATEGORY  : {
     SYSTEM          : 'system',
@@ -57,7 +60,7 @@ export default {
   template(name) {
     /* clean message struct before create new */
     this._clear();
-    
+ 
     switch (name) {
       
       case TEMPLATE.INVITE_TODO :
@@ -122,7 +125,11 @@ export default {
         this.msgStruct.subject = MESSAGES.SUBJECT.INVITE_GROUP;
         return this;
 
-
+      case TEMPLATE.DELETE_GROUP :
+        this.msgStruct.type = MESSAGES.TYPE.ALERT;
+        this.msgStruct.category = MESSAGES.CATEGORY.NOTIFICATION;
+        this.msgStruct.subject = MESSAGES.SUBJECT.DELETE_GROUP;
+        return this;
 
       default :
         return this;

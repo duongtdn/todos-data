@@ -305,12 +305,15 @@ export const taskGroup = {
         const uid = auth.currentUser.uid;
         const updates = {};
         const stakeholders = [];
-
+        const receivers = [];
         // get a list of invited user, then recall all invited mesages
         for (let id in group.members) {
+          if (id === uid) { continue; }
           const user = group.members[id];
           if ((/invited/i).test(user.status)) {
             stakeholders.push(user);
+          } else {
+            receivers.push(user);
           }
         }
 
@@ -318,6 +321,19 @@ export const taskGroup = {
           stakeholders.forEach(user => {
             const [status, msgId] = user.status.split('.');
             updates[`users/${user.id}/msg/${msgId}`] = null;
+          });
+        }
+
+        if (receivers.length > 0) {
+          receivers.forEach(user => {
+            const message = messages.template(TEMPLATE.DELETE_GROUP).create({
+              receivers : [user.id],
+              content   : group.name,
+              taskGroup : group.id,
+            });
+            const msgKey = db.users.child(user.id).child('msg').push().key;
+            message.id = msgKey;
+            updates[`users/${user.id}/msg/${msgKey}`] = {...message};
           });
         }
 
