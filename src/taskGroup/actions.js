@@ -216,6 +216,10 @@ export const taskGroup = {
             }
             // also, remove user in share list
             members[id] = null;
+            // and remove in share list of each todo under this list
+            for (let todoId in group.todos) {
+              updates[`todos/${todoId}/share/${id}`] = null;
+            }
           } else if (member && /recall/i.test(member.status)) {
             // and recall invited message if any
             const [status, msgId] = member.status.split('.');
