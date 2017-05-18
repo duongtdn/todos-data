@@ -40,6 +40,7 @@ export const todos = {
         return new Promise((resolve, reject) => {
           db.users.getTodosList( list => {
             db.todos.get(list, todosList => {
+              dispatch(todos.validate(todosList));
               dispatch(todos.update(todosList));
               dispatch(data.received(DNODE.TODOS));
               resolve(todosList);
@@ -49,6 +50,32 @@ export const todos = {
         
 
       };
+  },
+
+  validate(todoList, callback) {
+    return (dispatch, getState) => {
+      const uid = auth.currentUser.uid;
+console.log('validate call')      
+      const updates = {};
+      const invalidatedList = [];
+      const groups = getState().taskGroup;
+
+      for (let todoId in todoList) {
+        const todo = todoList[todoId];
+        if (todo.group && groups[todo.group] === undefined) {
+          invalidatedList.push(todo);
+        }
+      }
+
+      invalidatedList.forEach( todo => {
+        updates[`todos/${todo.id}/share/{uid}`] = null;
+      });
+console.log(invalidatedList)      
+console.log(updates)
+      // update
+      _updateTodoAndUser (dispatch, updates);
+
+    };
   },
 
   add({text = '', share = {}, urgent = false, dueDate = '', group = null}) {
