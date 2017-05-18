@@ -8,6 +8,15 @@ import messages, {TEMPLATE, MESSAGES} from '../messages'
 
 import { TASKGROUP } from './constants'
 
+const COLLABORATOR = 'collaborator';
+const STATUS = {
+  PENDING   : 'pending',
+  COMPLETED : 'completed',
+  CANCELLED : 'cancelled',
+  CLEANED   : 'cleaned',
+  LISTING   : 'listing'
+}
+
 /* action creators */
 export const taskGroup = {
 
@@ -102,14 +111,28 @@ export const taskGroup = {
         const taskGroupId = message.taskGroup;
         const updates = {};
         if (taskGroupId) {
-          updates[`groups/${taskGroupId}/members/${uid}/status`] = 'accepted';
-          updates[`users/${uid}/groups/${taskGroupId}`] = {color, role : 'member'};
-          updates[`users/${uid}/msg/${message.id}`] = null;
-        }
-        // update
-        return db.root.update(updates).then(() => {
-          resolve();
-        }).catch(err => reject(err));
+          // I need to load the list from server
+          db.root.child(`groups/${taskGroupId}`).once('value').then( snap => {
+            if (snap.exists()) {
+              const group = snap.val();
+              // accept list and clean up message
+              updates[`groups/${taskGroupId}/members/${uid}/status`] = 'accepted';
+              updates[`users/${uid}/groups/${taskGroupId}`] = {color, role : 'member'};
+              updates[`users/${uid}/msg/${message.id}`] = null;
+              // also update for todos under group
+              for (let todoId in group.todos) {
+                updates[`todos/${todoId}/share/${uid}/status`] = 'accepted';
+                updates[`users/${uid}/todos/${todoId}`] = {status : STATUS.LISTING, role : COLLABORATOR};
+              }
+              // update
+              return db.root.update(updates).then(() => {
+                resolve();
+              }).catch(err => reject(err));
+            } else {
+              reject('cannot load to-do list')
+            }
+          });                  
+        }     
       });
     }
   },
@@ -121,13 +144,24 @@ export const taskGroup = {
         const taskGroupId = message.taskGroup;
         const updates = {};
         if (taskGroupId) {
-          updates[`groups/${taskGroupId}/members/${uid}`] = null;
-          updates[`users/${uid}/msg/${message.id}`] = null;
-        }
-        // update
-        return db.root.update(updates).then(() => {
-          resolve();
-        }).catch(err => reject(err));
+          db.root.child(`groups/${taskGroupId}`).once('value').then( snap => {
+            if (snap.exists()) {
+              const group = snap.val();
+              updates[`groups/${taskGroupId}/members/${uid}`] = null;
+              updates[`users/${uid}/msg/${message.id}`] = null;
+              // also self-remove from the share list
+              for (let todoId in group.todos) {
+                updates[`todos/${todoId}/share/${uid}`] = null;
+              }
+              // update
+              return db.root.update(updates).then(() => {
+                resolve();
+              }).catch(err => reject(err));
+            } else {
+              reject('cannot load to-do list')
+            }
+          });
+        }        
       })
     }
   },
@@ -192,6 +226,16 @@ export const taskGroup = {
             message.id = msgKey;
             updates[`users/${id}/msg/${msgKey}`] = {...message};
             member.status =  `invited.${msgKey}`;
+            // also invite for all todos from the list
+            for (let todoId in group.todos) {
+              updates[`todos/${todoId}/share/${id}`] = {
+                status : `invited.${msgKey}`,
+                role : COLLABORATOR,
+                name : member.name,
+                id : member.id
+              };
+            }
+
           } else if (member && member.status === 'unshared') {
             if (id !== uid) {
               // send an info message to user whom removed from the list
