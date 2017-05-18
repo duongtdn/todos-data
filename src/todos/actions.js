@@ -61,27 +61,44 @@ export const todos = {
         const stakeholders = {};
         
         // prepare invitation messages
-        if (share.length > 0) {
-          share.forEach(user => {
-            if (user.id === uid) { return }
-            const message = messages.template(TEMPLATE.INVITE_TODO).create({
-              receivers : [user.id],
-              content   : text,
-              todo      : todoId,
-              taskGroup : group && group.updated && group.updated !== '_0_' ? group.updated : '',
-            });
-            const msgKey = db.users.child(user.id).child('msg').push().key;
-            message.id = msgKey;
-            updates[`users/${user.id}/msg/${msgKey}`] = {...message};
-            stakeholders[user.id] = {
-              status : `invited.${msgKey}`,
-              role : COLLABORATOR,
-              name : user.name,
-              id : user.id
-            };
-          });
-          
+        // get group
+        let taskGroup = '';
+        if (group && group.updated && group.updated !== '_0_') {
+          taskGroup = group.updated;
+          updates[`groups/${taskGroup}/todos/${todoId}`] = true;
         }
+        console.log()
+          if (share.length > 0) {
+            share.forEach(user => {
+              if (user.id === uid) { return }
+              // send invitation messages only if no group is chosen
+              if (taskGroup.length === 0) {
+                const message = messages.template(TEMPLATE.INVITE_TODO).create({
+                  receivers : [user.id],
+                  content   : text,
+                  todo      : todoId,
+                  taskGroup : taskGroup,
+                });
+                const msgKey = db.users.child(user.id).child('msg').push().key;
+                message.id = msgKey;
+                updates[`users/${user.id}/msg/${msgKey}`] = {...message};
+                // user share info
+                stakeholders[user.id] = {
+                  status : `invited.${msgKey}`,
+                  role : COLLABORATOR,
+                  name : user.name,
+                  id : user.id
+                };
+              } else {
+                stakeholders[user.id] = {
+                  status : `invited.${taskGroup}`,
+                  role : COLLABORATOR,
+                  name : user.name,
+                  id : user.id
+                };
+              }              
+            });          
+        }          
         // prepare todo
         stakeholders[uid] = {
           status : 'accepted',
@@ -89,14 +106,7 @@ export const todos = {
           name : auth.currentUser.email,
           id : uid
         };
-
-
-        // get group
-        let taskGroup = null;
-        if (group && group.updated && group.updated !== '_0_') {
-          taskGroup = group.updated;
-          updates[`groups/${taskGroup}/todos/${todoId}`] = true;
-        }
+        
 
         const timestamp = getTime();
         updates[`todos/${todoId}`] = {
@@ -154,8 +164,6 @@ export const todos = {
       return;
     }
 
-    // find owner
-    
     if (todo.share[uid].role === 'owner') {
       const stakeholders = [];
       const receivers = [];
@@ -380,52 +388,64 @@ export const todos = {
         } else if (todo.group.origin) {
           group = todo.group.origin !== '_0_' ? todo.group.origin  : '';
         }
-      }                 
-      for (let id in todo.share) {
-        if (id === uid) { continue }
-        const user = {...todo.share[id]};
+      }   
 
-        if (user && user.status === 'unshared') {
-          if (user.id !== uid) {
-            // send a info message to user whom removed from the list
-            const message = messages.template(TEMPLATE.UNSHARE).create({
-              receivers : [id],
+      /* send notification messages
+         change: if group (list) is used, no need to send messages */
+      if (group.length === 0) {
+         for (let id in todo.share) {
+          if (id === uid) { continue }
+          const user = {...todo.share[id]};
+
+          if (user && user.status === 'unshared') {
+            if (user.id !== uid) {
+              // send a info message to user whom removed from the list
+              const message = messages.template(TEMPLATE.UNSHARE).create({
+                receivers : [id],
+                content   : todo.text,
+                todo      : todo.id,
+                taskGroup : group,
+              });
+              const msgKey = db.users.child(id).child('msg').push().key;
+              message.id = msgKey;
+              updates[`users/${id}/msg/${msgKey}`] = {...message};
+            }
+            // also, remove user in share list
+            todo.share[id] = null;
+          }
+
+          if (user && /recall/i.test(user.status)) {          
+            // and recall invited message if any
+            const [status, msgId] = user.status.split('.');
+            if (msgId) {
+              updates[`users/${user.id}/msg/${msgId}`] = null;
+              // also, remove user in share list
+              todo.share[id] = null;
+            }
+          }
+          
+          if (user && user.status === 'invited') {
+            // send invite message to whom invited
+            const message = messages.template(TEMPLATE.INVITE_TODO).create({
+              receivers : [user.id],
               content   : todo.text,
               todo      : todo.id,
               taskGroup : group,
             });
-            const msgKey = db.users.child(id).child('msg').push().key;
+            const msgKey = db.users.child(user.id).child('msg').push().key;
             message.id = msgKey;
-            updates[`users/${id}/msg/${msgKey}`] = {...message};
-          }
-          // also, remove user in share list
-          todo.share[id] = null;
-        }
-
-        if (user && /recall/i.test(user.status)) {          
-          // and recall invited message if any
-          const [status, msgId] = user.status.split('.');
-          if (msgId) {
-            updates[`users/${user.id}/msg/${msgId}`] = null;
-            // also, remove user in share list
-            todo.share[id] = null;
+            todo.share[id].status = `invited.${msgKey}`;
+            updates[`users/${user.id}/msg/${msgKey}`] = {...message};
           }
         }
-        
-        if (user && user.status === 'invited') {
-          // send confirm message to whom invited
-          const message = messages.template(TEMPLATE.INVITE_TODO).create({
-            receivers : [user.id],
-            content   : todo.text,
-            todo      : todo.id,
-            taskGroup : group,
-          });
-          const msgKey = db.users.child(user.id).child('msg').push().key;
-          message.id = msgKey;
-          todo.share[id].status = `invited.${msgKey}`;
-          updates[`users/${user.id}/msg/${msgKey}`] = {...message};
+      } else {
+        for (let id in todo.share) {
+          if (id === uid) { continue }
+          // mark that user is invited with the list
+          todo.share[id].status = `invited.${group}`;
         }
       }
+     
 
       // update group
       if (todo.group) {
