@@ -229,7 +229,7 @@ export const taskGroup = {
             // also invite for all todos from the list
             for (let todoId in group.todos) {
               updates[`todos/${todoId}/share/${id}`] = {
-                status : `invited.${group.id}`,
+                status : `invited..${group.id}`,
                 role : COLLABORATOR,
                 name : member.name,
                 id : member.id

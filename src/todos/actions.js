@@ -53,7 +53,7 @@ export const todos = {
 
   add({text = '', share = {}, urgent = false, dueDate = '', group = null}) {
 
-    return dispatch => {
+    return (dispatch, getState) => {
       if (auth.currentUser) {
         const uid = auth.currentUser.uid;
         const updates = {};
@@ -67,37 +67,44 @@ export const todos = {
           taskGroup = group.updated;
           updates[`groups/${taskGroup}/todos/${todoId}`] = true;
         }
-        console.log()
-          if (share.length > 0) {
-            share.forEach(user => {
-              if (user.id === uid) { return }
-              // send invitation messages only if no group is chosen
-              if (taskGroup.length === 0) {
-                const message = messages.template(TEMPLATE.INVITE_TODO).create({
-                  receivers : [user.id],
-                  content   : text,
-                  todo      : todoId,
-                  taskGroup : taskGroup,
-                });
-                const msgKey = db.users.child(user.id).child('msg').push().key;
-                message.id = msgKey;
-                updates[`users/${user.id}/msg/${msgKey}`] = {...message};
-                // user share info
-                stakeholders[user.id] = {
-                  status : `invited.${msgKey}`,
-                  role : COLLABORATOR,
-                  name : user.name,
-                  id : user.id
-                };
-              } else {
-                stakeholders[user.id] = {
-                  status : `invited.${taskGroup}`,
-                  role : COLLABORATOR,
-                  name : user.name,
-                  id : user.id
-                };
-              }              
-            });          
+        const list = taskGroup.length > 0? getState().taskGroup[taskGroup] : null;
+        if (share.length > 0) {
+          share.forEach(user => {
+            if (user.id === uid) { return }
+            /* send invitation messages 
+                Issue:, if message is sent to user who are inviting to the 
+                group, then user may decline the group but still accept the
+                message, then can access to to-do -> cause bug
+                Solution: only send message to accepted people
+            */   
+            if ((list === null) || 
+                (list && list.members[user.id] && list.members[user.id].status === 'accepted')) {
+              const message = messages.template(TEMPLATE.INVITE_TODO).create({
+                receivers : [user.id],
+                content   : text,
+                todo      : todoId,
+                taskGroup : taskGroup,
+              });
+              const msgKey = db.users.child(user.id).child('msg').push().key;
+              message.id = msgKey;
+              updates[`users/${user.id}/msg/${msgKey}`] = {...message};
+              // user share info
+              stakeholders[user.id] = {
+                status : `invited.${msgKey}`,
+                role : COLLABORATOR,
+                name : user.name,
+                id : user.id
+              };  
+            } else if(list && list.members[user.id] && /invited/.test(list.members[user.id].status)) {
+              // user share info
+              stakeholders[user.id] = {
+                status : `invited..${taskGroup}`,
+                role : COLLABORATOR,
+                name : user.name,
+                id : user.id
+              }; 
+            }
+          });          
         }          
         // prepare todo
         stakeholders[uid] = {
@@ -391,7 +398,8 @@ export const todos = {
       }   
 
       /* send notification messages
-         change: if group (list) is used, no need to send messages */
+         change: if group (list) is used, only send invitation message to 
+         accepted people so that auto accept will take place  */
       if (group.length === 0) {
          for (let id in todo.share) {
           if (id === uid) { continue }
@@ -440,9 +448,11 @@ export const todos = {
         }
       } else {
         for (let id in todo.share) {
-          if (id === uid) { continue }
+          if (id === uid) { continue ;}
+          const user = {...todo.share[id]};
+          
           // mark that user is invited with the list
-          todo.share[id].status = `invited.${group}`;
+          todo.share[id].status = `invited..${group}`;
         }
       }
      
