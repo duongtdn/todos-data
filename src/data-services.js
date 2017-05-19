@@ -55,8 +55,14 @@ db.todos.get = (list, callback) => {
       // register a listener
       db.todos.lists[id].on('value', snap => {
         const todo = snap.val();
-        if (todo) {
-          db.todos.todosList[id] = todo;  
+        if (todo) {        
+          if (/^invited$/.test(todo.share[uid].status)) {
+            // if only be invited but not sent a message (mainly dueto group 
+            // invitation is waiting for accept)
+            invalidateTodos.push(id);
+          } else {
+            db.todos.todosList[id] = todo; 
+          } 
         } else {
           // incase this todo is removed
           // db.todos.lists[id].off('value');
