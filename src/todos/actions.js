@@ -401,13 +401,32 @@ export const todos = {
          change: if group (list) is used, only send invitation message to 
          accepted people so that auto accept will take place  */
       if (group.length === 0) {
+
         // no group
         for (let id in todo.share) {
           if (id === uid) {
+            const user = {...todo.share[uid]};
+            // is user self-remove
+            if (/unshared/.test(user.status)) {
+              todo.share[uid] = null;
+            }
             continue;
           }
 
           const user = {...todo.share[id]};
+
+          // incase user has self-remove, broadcase left message
+          if (todo.share[uid] === null || todo.share[uid].status === 'unshared') {
+            const message = messages.template(TEMPLATE.LEFT).create({
+                receivers : [id],
+                content   : todo.text,
+                todo      : todo.id,
+                taskGroup : group,
+              });
+              const msgKey = db.users.child(id).child('msg').push().key;
+              message.id = msgKey;
+              updates[`users/${id}/msg/${msgKey}`] = {...message};
+          }
 
           if (/unshared/.test(user.status)) {
             if (user.id !== uid) {

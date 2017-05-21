@@ -56,7 +56,7 @@ db.todos.get = (list, callback) => {
       db.todos.lists[id].on('value', snap => {
         const todo = snap.val();
         if (todo) {        
-          if (/^invited$/.test(todo.share[uid].status)) {
+          if (todo.share[uid] && /^invited$/.test(todo.share[uid].status)) {
             // if only be invited but not sent a message (mainly dueto group 
             // invitation is waiting for accept)
             invalidateTodos.push(id);
