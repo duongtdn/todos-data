@@ -403,7 +403,10 @@ export const todos = {
       if (group.length === 0) {
         // no group
         for (let id in todo.share) {
-          if (id === uid) { continue }
+          if (id === uid) {
+            continue;
+          }
+
           const user = {...todo.share[id]};
 
           if (/unshared/.test(user.status)) {
@@ -436,8 +439,8 @@ export const todos = {
               }
             }
           }
-          
-          if (/invited/.test(user.status)) {
+        
+          if (/^invited$/.test(user.status)) {
             // send invite message to whom invited
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
