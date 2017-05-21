@@ -406,7 +406,7 @@ export const todos = {
           if (id === uid) { continue }
           const user = {...todo.share[id]};
 
-          if (user && user.status === 'unshared') {
+          if (/unshared/.test(user.status)) {
             if (user.id !== uid) {
               // send a info message to user whom removed from the list
               const message = messages.template(TEMPLATE.UNSHARE).create({
@@ -420,20 +420,24 @@ export const todos = {
               updates[`users/${id}/msg/${msgKey}`] = {...message};
             }
             // also, remove user in share list
-            todo.share[id] = null;
+            if (!/invited/.test(user.status)) {
+                todo.share[id] = null;
+            }
           }
 
-          if (user && /recall/i.test(user.status)) {          
+          if (/recall/i.test(user.status)) {          
             // and recall invited message if any
             const [status, msgId] = user.status.split('.');
             if (msgId) {
               updates[`users/${user.id}/msg/${msgId}`] = null;
               // also, remove user in share list
-              todo.share[id] = null;
+              if (!/invited/.test(user.status)) {
+                todo.share[id] = null;
+              }
             }
           }
           
-          if (user && user.status === 'invited') {
+          if (/invited/.test(user.status)) {
             // send invite message to whom invited
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
@@ -545,23 +549,6 @@ export const todos = {
         }        
       }  
 
-      
-/*
-      if (Object.keys(updates).length > 0) {
-        // send message to stakeholders to notify change
-        if (stakeholders.length > 0) {
-          const message = messages.template(TEMPLATE.CHANGE_TODO).create({
-            receivers : stakeholders,
-            content   : todo.text
-          });
-          stakeholders.forEach(user => {
-            const msgKey = db.users.child(user).child('msg').push().key;
-            message.id = msgKey;
-            updates[`users/${user}/msg/${msgKey}`] = message;
-          });
-        }
-      }
-*/
       // update
       _updateTodoAndUser (dispatch, updates);
 
