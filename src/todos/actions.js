@@ -459,7 +459,7 @@ export const todos = {
             }
           }
         
-          if (/^invited$/.test(user.status)) {
+          if (/(invited$)|(invited\*)/.test(user.status)) { // invited | invited*unshared
             // send invite message to whom invited
             const message = messages.template(TEMPLATE.INVITE_TODO).create({
               receivers : [user.id],
